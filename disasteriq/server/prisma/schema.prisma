@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  password       String
+  name           String
+  role           String           @default("CITIZEN")
+  region         String           @default("default")
+  phone          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  incidents      Incident[]
+  helpRequests   HelpRequest[]
+  volunteer      Volunteer?
+  damageReports  DamageReport[]
+  resourcePledges ResourcePledge[]
+  familyMembers  FamilyMember[]
+  safetyStatuses SafetyStatus[]
+}
+
+model Incident {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  type        String
+  severity    String   @default("MEDIUM")
+  latitude    Float
+  longitude   Float
+  region      String
+  status      String   @default("active")
+  affected    Int      @default(0)
+  rescued     Int      @default(0)
+  reportedBy  String
+  user        User     @relation(fields: [reportedBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HelpRequest {
+  id          String   @id @default(uuid())
+  type        String
+  description String
+  urgency     String   @default("high")
+  latitude    Float
+  longitude   Float
+  region      String
+  peopleCount Int      @default(1)
+  contact     String?
+  landmark    String?
+  status      String   @default("PENDING")
+  assignedTo  String?
+  requestedBy String
+  user        User     @relation(fields: [requestedBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Volunteer {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  skills     String   @default("[]")
+  status     String   @default("AVAILABLE")
+  latitude   Float?
+  longitude  Float?
+  region     String
+  deployedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Shelter {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  type      String   @default("shelter")
+  latitude  Float
+  longitude Float
+  region    String
+  capacity  Int      @default(100)
+  occupancy Int      @default(0)
+  amenities String   @default("[]")
+  contact   String?
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Resource {
+  id        String           @id @default(uuid())
+  name      String
+  category  String
+  icon      String?
+  needed    Int              @default(0)
+  pledged   Int              @default(0)
+  region    String
+  postedBy  String
+  status    String           @default("active")
+  pledges   ResourcePledge[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model ResourcePledge {
+  id         String   @id @default(uuid())
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now())
+}
+
+model DamageReport {
+  id          String   @id @default(uuid())
+  type        String
+  severity    String   @default("MODERATE")
+  description String
+  latitude    Float
+  longitude   Float
+  region      String
+  photoUrl    String?
+  reportedBy  String
+  user        User     @relation(fields: [reportedBy], references: [id])
+  status      String   @default("reported")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Alert {
+  id        String    @id @default(uuid())
+  title     String
+  message   String
+  type      String
+  severity  String    @default("info")
+  region    String
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+}
+
+model FamilyMember {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  phone     String?
+  relation  String?
+  createdAt DateTime @default(now())
+}
+
+model SafetyStatus {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  isSafe    Boolean  @default(false)
+  latitude  Float?
+  longitude Float?
+  message   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Titanium Horizon Palette */
+  --bg-primary: #020617;        /* Slate 950 */
+  --bg-panel: #0f172a;          /* Slate 900 */
+  --bg-card: #1e293b;           /* Slate 800 */
+  
+  --interactive: #10b981;       /* Emerald 500 */
+  --interactive-hover: #059669; /* Emerald 600 */
+  
+  --accent-blue: #38bdf8;       /* Sky 400 */
+  --accent-purple: #818cf8;     /* Indigo 400 */
+  --accent-warning: #f59e0b;    /* Amber 500 */
+  
+  --safe: #10b981;              /* Emerald 500 */
+  --warning: #f59e0b;           /* Amber 500 */
+  --critical: #f43f5e;          /* Rose 500 */
+  --intel: #38bdf8;             /* Sky 400 */
+  
+  --text-primary: #f8fafc;      /* Slate 50 */
+  --text-muted: #94a3b8;        /* Slate 400 */
+  --border: rgba(255, 255, 255, 0.06);
+}
+
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-card: var(--bg-card);
+  --color-interactive: var(--interactive);
+  --color-interactive-hover: var(--interactive-hover);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-purple: var(--accent-purple);
+  --color-safe: var(--safe);
+  --color-warning: var(--warning);
+  --color-critical: var(--critical);
+  --color-intel: var(--intel);
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+}
+
+@layer base {
+  body {
+    @apply bg-bg-primary text-text-primary antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Custom Selection */
+  ::selection {
+    @apply bg-interactive/30 text-white;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-bg-panel/40 backdrop-blur-3xl border border-white/5 shadow-2xl;
+  }
+
+  .soft-card {
+    @apply bg-white/2 backdrop-blur-2xl border border-white/5 rounded-[32px] transition-all duration-500;
+  }
+
+  .btn-primary {
+    @apply bg-interactive hover:bg-interactive-hover text-bg-primary font-black transition-all active:scale-95 shadow-2xl shadow-interactive/20;
+  }
+
+  .input-field {
+    @apply bg-white/2 border border-white/5 rounded-[20px] px-6 py-4 focus:outline-none focus:border-interactive focus:bg-white/5 transition-all text-white placeholder:text-white/10 font-medium;
+  }
+
+  .text-gradient-emerald {
+    @apply bg-gradient-to-r from-interactive to-accent-blue bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-rose {
+    @apply bg-gradient-to-r from-critical to-amber-500 bg-clip-text text-transparent;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Luxury Animations */
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* Map Markers Styling */
+.precision-pulse {
+  position: relative;
+}
+.precision-pulse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  animation: marker-pulse 2s infinite;
+}
+
+@keyframes marker-pulse {
+  0% { width: 100%; height: 100%; opacity: 1; }
+  100% { width: 300%; height: 300%; opacity: 0; }
+}
+
+/* Custom Background Mesh */
+.bg-mesh {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
+}
+
+/* Typography Overrides */
+.tracking-tighter { letter-spacing: -0.05em; }
+.tracking-widest { letter-spacing: 0.25em; }
+
+/* Scrollbar Refinement */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-bg-primary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/5 rounded-full hover:bg-white/10 transition-colors;
+}
