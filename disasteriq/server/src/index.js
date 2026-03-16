@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -19,6 +20,9 @@ const alertRoutes = require('./routes/alerts');
 const weatherRoutes = require('./routes/weather');
 const aiRoutes = require('./routes/ai');
 const adminRoutes = require('./routes/admin');
+const evacuationRoutes = require('./routes/evacuation');
+const scenarioRoutes = require('./routes/scenarios');
+const meshRoutes = require('./routes/mesh');
 const { setupSockets } = require('./sockets');
 
 const prisma = new PrismaClient();
@@ -66,6 +70,9 @@ apiRouter.use('/alerts', alertRoutes);
 apiRouter.use('/weather', weatherRoutes);
 apiRouter.use('/ai-risk', aiRoutes);
 apiRouter.use('/admin', adminRoutes);
+apiRouter.use('/evacuation', evacuationRoutes);
+apiRouter.use('/scenarios', scenarioRoutes);
+apiRouter.use('/mesh', meshRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

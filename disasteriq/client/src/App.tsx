@@ -13,6 +13,8 @@ import ResourcesPage from './pages/ResourcesPage';
 import DamagePage from './pages/DamagePage';
 import AIRiskPage from './pages/AIRiskPage';
 import AdminPage from './pages/AdminPage';
+import EvacuationPage from './pages/EvacuationPage';
+import ScenarioPage from './pages/ScenarioPage';
 import { Loader2 } from 'lucide-react';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -47,7 +49,9 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
             <div className="absolute inset-0 rounded-full border-2 border-interactive/10"></div>
             <div className="absolute inset-0 rounded-full border-t-2 border-interactive animate-spin"></div>
           </div>
-          <p className="text-[12px] font-black text-text-muted uppercase tracking-[0.4em] animate-pulse">Initializing Tactical Grid...</p>
+            <div className="absolute inset-x-0 bottom-0 mb-8 text-center px-4">
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">Loading DisasterIQ...</p>
+            </div>
         </div>
       </div>
     );
@@ -79,6 +83,8 @@ export default function App() {
             <Route path="resources" element={<ResourcesPage />} />
             <Route path="damage" element={<DamagePage />} />
             <Route path="ai-risk" element={<AIRiskPage />} />
+            <Route path="evacuation" element={<EvacuationPage />} />
+            <Route path="scenarios" element={<ScenarioPage />} />
             <Route path="admin" element={<AdminPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

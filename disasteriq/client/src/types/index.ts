@@ -146,6 +146,7 @@ export interface WeatherData {
 export interface RiskData {
   region: string;
   generatedAt: string;
+  aiExecutiveSummary?: string;
   risks: {
     type: string;
     label: string;

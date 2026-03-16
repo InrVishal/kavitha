@@ -2,23 +2,29 @@ const express = require('express');
 const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
+const { generateTacticalAdvice } = require('../services/geminiService');
 
-// GET /ai-risk/:region - Mock AI risk predictions
+// GET /ai-risk/:region - AI risk predictions with Gemini insights
 router.get('/:region', authenticate, async (req, res) => {
   try {
     const { region } = req.params;
 
-    // Mock AI risk prediction data
+    const prompt = `Act as a senior disaster mitigation AI. For the region "${region}", provide 3 brief bullet points (max 10 words each) predicting the most likely disaster scenario based on current satellite telemetry showing increased precipitation and structural stress. Output only the bullet points.`;
+    
+    const predictionText = await generateTacticalAdvice(prompt);
+
+    // Mock AI risk prediction data with some dynamic text
     const riskData = {
       region,
       generatedAt: new Date().toISOString(),
+      aiExecutiveSummary: predictionText,
       risks: [
         {
           type: 'flood',
           label: 'Flood Risk',
           score: 87,
           trend: 'increasing',
-          prediction: 'High probability of flash flooding in low-lying areas within 24-48 hours.',
+          prediction: 'High probability of flash flooding. Gemini Matrix suggests immediate reinforcement of sector barriers.',
           timeline: [
             { hour: 0, risk: 72 },
             { hour: 12, risk: 80 },
@@ -90,6 +96,23 @@ router.get('/:region', authenticate, async (req, res) => {
     res.json(riskData);
   } catch (error) {
     res.status(500).json({ error: 'Failed to generate risk prediction' });
+  }
+});
+
+// POST /ai/chat - Simple AI assistant chat
+router.post('/chat', authenticate, async (req, res) => {
+  try {
+    const { message, context } = req.body;
+    
+    const prompt = `You are the DisasterIQ AI Assistant. A user is asking for help or information.
+    Context: ${context || 'General emergency response'}
+    User Message: ${message}
+    Provide a helpful, tactical, and brief (max 50 words) response. Avoid generic statements; be specific to emergency preparedness or response.`;
+
+    const response = await generateTacticalAdvice(prompt);
+    res.json({ response });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to generate AI response' });
   }
 });
 

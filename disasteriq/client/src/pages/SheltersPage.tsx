@@ -47,131 +47,131 @@ export default function SheltersPage() {
   );
 
   return (
-    <div className="p-12 lg:p-16 max-w-7xl mx-auto font-sans min-h-screen">
-      {/* Precision Haven Header */}
-      <div className="bg-white/2 backdrop-blur-3xl border border-white/5 rounded-[40px] p-12 mb-16 shadow-2xl relative overflow-hidden animate-fade-slide-up">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-safe/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2" />
+    <div className="p-8 lg:p-12 max-w-7xl mx-auto font-sans min-h-screen bg-bg-primary">
+      {/* Header */}
+      <div className="bg-white border border-slate-200 rounded-[40px] p-10 lg:p-12 mb-12 shadow-xl shadow-slate-900/5 relative overflow-hidden animate-fade-slide-up">
+        <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-indigo-50 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 -z-1" />
         
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
-          <div className="flex items-center gap-10">
-            <div className="w-20 h-20 rounded-[30px] bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group">
-              <Building2 className="w-10 h-10 text-interactive group-hover:scale-110 transition-transform duration-500" />
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+          <div className="flex items-center gap-8">
+            <div className="w-16 h-16 rounded-3xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm">
+              <Building2 className="w-8 h-8 text-indigo-600" />
             </div>
             <div>
-              <h1 className="text-4xl font-black text-white font-display tracking-tighter leading-none mb-4 uppercase">Sanctuary <span className="text-gradient-emerald">Network</span></h1>
-              <p className="text-[16px] text-text-muted font-medium tracking-tight opacity-70">Authenticated high-integrity survival hubs and real-time capacity monitoring.</p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Safety Shelters</h1>
+              <p className="text-slate-500 font-medium tracking-tight">Verified emergency housing and medical facilities with real-time capacity.</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-4 bg-white/2 p-2 rounded-[32px] border border-white/5 backdrop-blur-xl no-scrollbar overflow-x-auto shadow-inner">
+          <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-[28px] border border-slate-100 no-scrollbar overflow-x-auto">
             {['all', 'shelter', 'hospital', 'food'].map(type => (
               <button 
                 key={type}
                 onClick={() => setTypeFilter(type)}
-                className={`px-10 py-3.5 rounded-[22px] text-[12px] font-black uppercase tracking-[0.3em] transition-all duration-500 ${
-                   typeFilter === type ? 'bg-interactive text-bg-primary shadow-2xl shadow-interactive/20' : 'text-text-muted/40 hover:text-white'
+                className={`px-8 py-3 rounded-[22px] text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${
+                   typeFilter === type ? 'bg-white text-indigo-600 shadow-lg shadow-slate-900/5 border border-slate-100' : 'text-slate-400 hover:text-slate-600'
                 }`}
               >
-                {type}
+                {type === 'all' ? 'All' : type}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-16">
-        {/* Intelligence Feed */}
-        <div className="space-y-14">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
+        {/* Main Feed */}
+        <div className="space-y-10">
           <div className="relative group">
-            <Search className="absolute left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted/20 group-focus-within:text-interactive transition-colors" />
+            <Search className="absolute left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
             <input 
               type="text"
-              placeholder="COORD_SCAN: NAME, ADDR, OR SECTOR_INDEX..."
+              placeholder="Search by name, address, or region..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white/2 border border-white/5 rounded-[40px] pl-20 pr-10 py-7 text-[16px] text-white focus:outline-none focus:border-interactive transition-all shadow-inner font-mono tracking-tighter uppercase placeholder:text-white/5"
+              className="w-full bg-white border border-slate-200 rounded-[32px] pl-20 pr-10 py-5 text-sm font-bold text-slate-900 focus:outline-none focus:border-indigo-500 transition-all shadow-sm placeholder:text-slate-300"
             />
           </div>
 
           {loading ? (
-            <div className="py-40 flex flex-col items-center justify-center animate-pulse">
-              <div className="relative w-20 h-20 mb-10">
-                 <Loader2 className="w-20 h-20 text-safe animate-spin opacity-20" />
-                 <div className="absolute inset-0 border-t-2 border-safe rounded-full animate-spin-slow" />
+            <div className="py-32 flex flex-col items-center justify-center">
+              <div className="relative w-16 h-16 mb-8">
+                 <Loader2 className="w-16 h-16 text-indigo-50 animate-spin" />
+                 <div className="absolute inset-0 border-t-2 border-indigo-600 rounded-full animate-spin" />
               </div>
-              <span className="text-[12px] font-black text-text-muted/40 uppercase tracking-[0.5em]">Calibrating Vector Entrances...</span>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest animate-pulse">Locating nearby shelters...</span>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {filtered.map((shelter, i) => (
                 <div 
                   key={shelter.id} 
-                  className="soft-card group animate-fade-slide-up bg-white/2 border-white/5 hover:border-white/10 hover:bg-white/3 transition-all overflow-hidden rounded-[40px]"
+                  className="bg-white group animate-fade-slide-up border border-slate-200 hover:border-indigo-100 shadow-xl shadow-slate-900/5 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 rounded-[40px]"
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
                   <div className="p-10">
                     <div className="flex items-start justify-between mb-8">
-                      <div className="flex items-center gap-4">
-                        <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-inner ${
-                          shelter.type === 'hospital' ? 'bg-sky-500/10 text-sky-400 border-sky-500/20' : 
-                          shelter.type === 'food' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 
-                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border ${
+                          shelter.type === 'hospital' ? 'bg-sky-50 text-sky-600 border-sky-100' : 
+                          shelter.type === 'food' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
+                          'bg-emerald-50 text-emerald-600 border-emerald-100'
                         }`}>
                           {shelter.type}
                         </span>
-                        <div className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/5">
-                           <div className="w-1.5 h-1.5 rounded-full bg-safe shadow-[0_0_12px_#10b981] animate-pulse" />
-                           <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Integrity Verified</span>
+                        <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100">
+                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Verified</span>
                         </div>
                       </div>
-                      <span className="text-[11px] font-mono text-white/10 font-black uppercase tracking-widest">{shelter.region}</span>
+                      <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">{shelter.region}</span>
                     </div>
 
-                    <h3 className="text-[22px] font-black text-white mb-3 group-hover:text-interactive transition-colors uppercase tracking-tight leading-none">{shelter.name}</h3>
-                    <div className="flex items-start gap-4 mb-10">
-                      <MapPin className="w-4 h-4 text-interactive/40 shrink-0 mt-1" />
-                      <p className="text-[14px] text-text-muted leading-relaxed font-medium opacity-70 italic">{shelter.address}</p>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors leading-tight">{shelter.name}</h3>
+                    <div className="flex items-start gap-3 mb-8">
+                      <MapPin className="w-4 h-4 text-slate-300 shrink-0 mt-0.5" />
+                      <p className="text-sm text-slate-500 leading-relaxed font-medium">{shelter.address}</p>
                     </div>
 
-                    <div className="space-y-6 mb-12">
-                      <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.35em] text-white/20 mb-3 ml-2">
-                        <span>Tactical Load Offset</span>
-                        <span className="text-white font-mono tracking-tighter font-bold text-[14px]">{Math.round((shelter.occupancy / shelter.capacity) * 100)}%</span>
+                    {/* Capacity Indicator */}
+                    <div className="space-y-4 mb-10">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Occupancy Status</span>
+                        <span className="text-sm font-bold text-slate-900">{Math.round((shelter.occupancy / shelter.capacity) * 100)}%</span>
                       </div>
-                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
+                      <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
                         <div 
-                          className={`h-full transition-all duration-1000 shadow-[0_0_15px_currentColor] rounded-full ${
-                             (shelter.occupancy / shelter.capacity) > 0.9 ? 'text-critical' : 
-                             (shelter.occupancy / shelter.capacity) > 0.7 ? 'text-warning' : 'text-safe'
+                          className={`h-full transition-all duration-1000 rounded-full ${
+                             (shelter.occupancy / shelter.capacity) > 0.9 ? 'bg-rose-500' : 
+                             (shelter.occupancy / shelter.capacity) > 0.7 ? 'bg-amber-500' : 'bg-emerald-500'
                           }`}
-                          style={{ width: `${(shelter.occupancy / shelter.capacity) * 100}%`, backgroundColor: 'currentColor' }}
+                          style={{ width: `${(shelter.occupancy / shelter.capacity) * 100}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between text-[10px] font-mono font-bold text-white/10 tracking-widest uppercase px-2">
-                        <span>{shelter.occupancy} ACTIVE_UNITS</span>
-                        <span>{shelter.capacity} CAPACITY_LIMIT</span>
+                      <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">
+                        <span>{shelter.occupancy} Taken</span>
+                        <span>{shelter.capacity} Total Beds</span>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-3 mb-12 min-h-[60px] content-start">
+                    <div className="flex flex-wrap gap-2 mb-10 min-h-[50px] content-start">
                       {shelter.amenities.map(item => {
                         const Icon = (amenityIcons as any)[item] || CheckCircle2;
                         return (
-                          <div key={item} className="flex items-center gap-3 px-4 py-2 bg-white/2 rounded-2xl border border-white/5 hover:border-white/10 transition-all cursor-default">
-                            <Icon className="w-4 h-4 text-interactive/60" />
-                            <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">{item}</span>
+                          <div key={item} className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 hover:border-indigo-100 transition-all cursor-default">
+                            <Icon className="w-3.5 h-3.5 text-indigo-400" />
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{item}</span>
                           </div>
                         );
                       })}
                     </div>
 
                     <button 
-                      className="w-full py-5 rounded-[24px] bg-white/2 border border-white/5 font-black text-[13px] uppercase tracking-[0.4em] text-white/70 hover:bg-white/5 hover:border-interactive hover:text-white transition-all duration-500 flex items-center justify-center gap-6 group overflow-hidden relative"
+                      className="w-full py-4 rounded-2xl bg-indigo-50 border border-indigo-100 font-bold text-xs uppercase tracking-widest text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-4 group"
                       onClick={() => window.open(`http://maps.google.com/?q=${shelter.latitude},${shelter.longitude}`, '_blank')}
                     >
-                      <div className="absolute inset-y-0 left-0 w-1 bg-interactive transform -translate-x-full group-hover:translate-x-0 transition-transform" />
-                      <Navigation className="w-5 h-5 text-text-muted/40 group-hover:text-interactive group-hover:scale-110 transition-all relative z-10" /> 
-                      <span className="relative z-10">Uplink Vector</span>
+                      <Navigation className="w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /> 
+                      <span>Get Directions</span>
                     </button>
                   </div>
                 </div>
@@ -180,49 +180,49 @@ export default function SheltersPage() {
           )}
         </div>
 
-        {/* Tactical Advisory Matrix */}
-        <div className="hidden lg:block space-y-10">
-          <div className="soft-card glass-panel bg-white/1 p-12 sticky top-40 border-white/5 shadow-2xl rounded-[48px]">
-            <div className="flex items-center gap-6 mb-12">
-               <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                  <Target className="w-7 h-7 text-interactive" />
+        {/* Info & Safety Section */}
+        <div className="space-y-8">
+          <div className="bg-white border border-slate-200 p-10 lg:p-12 sticky top-32 shadow-xl shadow-slate-900/5 rounded-[48px] overflow-hidden">
+            <div className="absolute top-0 right-0 p-10 opacity-[0.02]">
+               <Shield className="w-40 h-40 text-indigo-600" />
+            </div>
+            
+            <div className="flex items-center gap-6 mb-10 relative z-10">
+               <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center border border-indigo-100">
+                  <Heart className="w-6 h-6 text-indigo-600" />
                </div>
                <div>
-                  <h3 className="text-[20px] font-black text-white uppercase tracking-tighter leading-none mb-2">Sector Command</h3>
-                  <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Operational Advisory Protocols</p>
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-1">Safety Tips</h3>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Arrival Protocols</p>
                </div>
             </div>
             
-            <div className="space-y-12">
+            <div className="space-y-10 relative z-10">
               {[
-                { icon: Heart, label: 'Asset Unity', text: 'Maintain strict group cohesion during transit. All units must broadcast identity signatures to intake officers.' },
-                { icon: ShieldCheck, label: 'Double Verification', text: 'Sanctuary integrity is verified by triple-redundancy relay nodes. False beacons are immediately purged.' },
-                { icon: Thermometer, label: 'Clinical Uplink', text: 'Bio-support suites are prioritized at hospital hubs marked as OMEGA-CLASS. Maintain medical clearance.' },
-                { icon: Navigation, label: 'Vector Correction', text: 'Routing telemetry synchronizes every 300s. Deviate only if primary vectors reach critical obstruction.' }
+                { icon: Users, label: 'Stay Together', text: 'Keep your group cohesive. Inform shelter staff of all family members upon arrival.' },
+                { icon: ShieldCheck, label: 'Verified Locations', text: 'Only go to verified shelters listed here or shared by official government channels.' },
+                { icon: Thermometer, label: 'Medical Care', text: 'If you have medical needs, prioritize hospital-type shelters marked in blue.' },
+                { icon: MapPin, label: 'Route Safety', text: 'Always check local route safety before traveling to a shelter during a flood.' }
               ].map((item, i) => (
-                <div key={i} className="flex gap-8 group">
-                  <div className="w-12 h-12 rounded-2xl bg-white/2 flex items-center justify-center shrink-0 border border-white/5 group-hover:bg-white/5 transition-all duration-500">
-                    <item.icon className="w-6 h-6 text-interactive/40 group-hover:text-interactive group-hover:scale-110 transition-all" />
+                <div key={i} className="flex gap-6 group">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-indigo-50 transition-all">
+                    <item.icon className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-all" />
                   </div>
                   <div>
-                    <h4 className="text-[14px] font-black text-white uppercase tracking-[0.2em] mb-3 group-hover:text-interactive transition-colors">{item.label}</h4>
-                    <p className="text-[14px] text-text-muted/60 leading-relaxed font-medium group-hover:text-white/80 transition-colors uppercase tracking-tight italic">{item.text}</p>
+                    <h4 className="text-sm font-bold text-slate-900 mb-1.5 group-hover:text-indigo-600 transition-colors">{item.label}</h4>
+                    <p className="text-sm text-slate-500 leading-relaxed font-medium">{item.text}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-16 p-10 rounded-[40px] bg-white/2 border border-white/5 relative overflow-hidden group">
-               <div className="absolute top-0 left-0 w-2 h-full bg-interactive opacity-20 group-hover:opacity-100 transition-opacity" />
-               <p className="text-[16px] font-black text-white uppercase tracking-tight mb-6 leading-relaxed relative z-10 italic">
-                  "WE MONITOR THE GRID. YOU SECURE THE HAVEN. RESILIENCE IS THE MISSION."
+            <div className="mt-12 p-8 rounded-[32px] bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 relative overflow-hidden group">
+               <p className="text-[15px] font-bold tracking-tight mb-4 leading-relaxed relative z-10 italic">
+                  "Your safety is our priority. Please help us maintain a supportive environment at all shelter locations."
                </p>
-               <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-2 h-2 rounded-full bg-interactive animate-pulse shadow-[0_0_10px_currentColor]" />
-                  <span className="text-[11px] font-black text-white/20 uppercase tracking-[0.5em]">Central Command // Auth: 41-A</span>
-               </div>
-               <div className="absolute bottom-0 right-0 p-8 opacity-5">
-                  <Cpu className="w-20 h-20 text-interactive" />
+               <div className="flex items-center gap-3 relative z-10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  <span className="text-[9px] font-bold opacity-60 uppercase tracking-widest">Safety Coordination Team</span>
                </div>
             </div>
           </div>

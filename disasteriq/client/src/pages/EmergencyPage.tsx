@@ -11,23 +11,23 @@ import {
 } from 'lucide-react';
 
 const emergencyTypes = [
-  { id: 'flood', label: 'Flood Unit', icon: Droplets, color: '#38bdf8' },
-  { id: 'fire', label: 'Extinguish', icon: Flame, color: '#f43f5e' },
-  { id: 'medical', label: 'Bio-Support', icon: Heart, color: '#f59e0b' },
-  { id: 'rescue', label: 'Extraction', icon: Shield, color: '#10b981' },
-  { id: 'structural', label: 'Sanctuary', icon: Building2, color: '#94a3b8' },
-  { id: 'power', label: 'Grid Utility', icon: Zap, color: '#f59e0b' },
-  { id: 'transport', label: 'Evac Vector', icon: Car, color: '#818cf8' },
-  { id: 'hazmat', label: 'Containment', icon: Radio, color: '#f43f5e' },
+  { id: 'flood', label: 'Flooding', icon: Droplets, color: '#0ea5e9' },
+  { id: 'fire', label: 'Fire', icon: Flame, color: '#f43f5e' },
+  { id: 'medical', label: 'Medical', icon: Heart, color: '#f59e0b' },
+  { id: 'rescue', label: 'Rescue', icon: Shield, color: '#10b981' },
+  { id: 'structural', label: 'Structural', icon: Building2, color: '#64748b' },
+  { id: 'power', label: 'Power Grid', icon: Zap, color: '#f59e0b' },
+  { id: 'transport', label: 'Transport', icon: Car, color: '#6366f1' },
+  { id: 'hazmat', label: 'Chemical', icon: Radio, color: '#f43f5e' },
 ];
 
 const schema = z.object({
-  type: z.string().min(1, 'Please choose a resource classification'),
-  description: z.string().min(10, 'Manifest requirement: 10+ characters'),
-  peopleCount: z.number().min(1, 'Minimum 1 occupant required').max(10000),
+  type: z.string().min(1, 'Please select an emergency type'),
+  description: z.string().min(10, 'Please provide more details (at least 10 characters)'),
+  peopleCount: z.number().min(1, 'Please specify the number of people').max(10000),
   urgency: z.enum(['low', 'medium', 'high', 'critical']),
-  contact: z.string().min(1, 'Contact uplink required for coordination'),
-  landmark: z.string().min(1, 'Sector landmark required for vectoring'),
+  contact: z.string().min(1, 'Please provide a contact number'),
+  landmark: z.string().min(1, 'Please specify a nearby landmark'),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -44,7 +44,6 @@ export default function EmergencyPage() {
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log('TRANS_REQ: Initializing SOS broadcast...', data);
     setLoading(true);
     try {
       const res = await api.post('/help-requests', {
@@ -52,10 +51,9 @@ export default function EmergencyPage() {
         latitude: position?.latitude || 28.6139,
         longitude: position?.longitude || 77.2090,
       });
-      console.log('TRANS_SUCCESS: Signal locked.', res.data);
       setSuccess(res.data.id);
     } catch (err) {
-      console.error('TRANS_FAIL: Protocol breach.', err);
+      console.error('Failed to send request', err);
     } finally {
       setLoading(false);
     }
@@ -63,28 +61,26 @@ export default function EmergencyPage() {
 
   if (success) {
     return (
-      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-8 bg-bg-primary font-sans">
-        <div className="soft-card glass-panel p-16 max-w-xl w-full text-center animate-fade-slide-up border-safe/20 shadow-[0_0_100px_rgba(16,185,129,0.1)] rounded-[40px]">
-          <div className="w-28 h-28 rounded-[36px] bg-safe/10 border border-safe/20 flex items-center justify-center mx-auto mb-10 shadow-3xl shadow-safe/20 overflow-hidden relative group">
-            <CheckCircle2 className="w-14 h-14 text-safe relative z-10" />
-            <div className="absolute inset-0 bg-safe/20 animate-pulse" />
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-8 bg-slate-50">
+        <div className="bg-white p-12 lg:p-16 max-w-2xl w-full text-center border border-slate-200 shadow-2xl rounded-[48px] animate-fade-slide-up">
+          <div className="w-24 h-24 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-10 shadow-xl shadow-emerald-500/10">
+            <CheckCircle2 className="w-12 h-12 text-emerald-500" />
           </div>
-          <h2 className="text-4xl font-black text-white mb-6 font-display tracking-tighter uppercase">Signal Locked</h2>
-          <p className="text-[16px] text-text-muted mb-12 leading-relaxed font-medium opacity-80 px-4">
-            Command has synchronized your coordinates. Dispatch vectors are now calculating the optimal response pathway. Maintain perimeter stability.
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Request Received</h2>
+          <p className="text-slate-500 text-lg mb-12 leading-relaxed font-medium px-4">
+            Help is on the way. Our emergency response team has received your coordinates and is prioritizing your request. Please stay in a safe location if possible.
           </p>
           
-          <div className="bg-white/2 border border-white/5 rounded-[32px] p-8 mb-12 relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1 h-full bg-interactive opacity-40" />
-            <span className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20 block mb-3">Manifest Token</span>
-            <span className="font-mono text-3xl font-black text-white tracking-[0.2em] uppercase">{success.substring(0, 8)}</span>
+          <div className="bg-slate-50 border border-slate-100 rounded-3xl p-8 mb-12 relative overflow-hidden group">
+            <p className="text-[11px] uppercase font-bold tracking-widest text-slate-400 mb-2">Request ID</p>
+            <p className="text-2xl font-bold text-slate-900 tracking-wider">#{success.substring(0, 8).toUpperCase()}</p>
           </div>
 
           <button
             onClick={() => { setSuccess(null); setSelectedType(''); }}
-            className="w-full py-6 rounded-[24px] bg-white/5 border border-white/10 text-white font-black uppercase tracking-[0.3em] hover:bg-white/10 transition-all flex items-center justify-center gap-5 group"
+            className="w-full py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all flex items-center justify-center gap-3 shadow-xl shadow-indigo-600/20"
           >
-            Log New Request <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+            Submit Another Request <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -92,160 +88,150 @@ export default function EmergencyPage() {
   }
 
   return (
-    <div className="p-12 lg:p-16 max-w-6xl mx-auto font-sans min-h-screen">
-      {/* Protocol Header */}
-      <div className="bg-white/2 backdrop-blur-3xl border border-white/5 rounded-[40px] p-12 mb-14 shadow-2xl relative overflow-hidden animate-fade-slide-up">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-critical/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2" />
+    <div className="p-8 lg:p-12 max-w-6xl mx-auto min-h-screen bg-bg-primary">
+      {/* Header */}
+      <div className="bg-white border border-slate-200 rounded-[40px] p-10 lg:p-12 mb-12 shadow-xl shadow-slate-900/5 relative overflow-hidden animate-fade-slide-up">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-rose-50 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 -z-1" />
         
-        <div className="relative z-10 flex items-center gap-12">
-          <div className="w-24 h-24 rounded-[32px] bg-critical/10 flex items-center justify-center shadow-3xl shadow-critical/20 border border-critical/10 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-critical opacity-0 group-hover:opacity-10 transition-opacity" />
-            <Siren className="w-12 h-12 text-critical animate-pulse" />
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+          <div className="w-20 h-20 rounded-3xl bg-rose-50 flex items-center justify-center border border-rose-100 shadow-lg shadow-rose-500/10">
+            <ShieldAlert className="w-10 h-10 text-rose-500" />
           </div>
           <div>
-            <h1 className="text-5xl font-black text-white font-display tracking-tighter leading-none mb-4 uppercase">SOS <span className="text-gradient-emerald">Protocol</span></h1>
-            <p className="text-[16px] text-text-muted font-medium tracking-tight opacity-70">Immediate emergency broadcast terminal. All requests are prioritized by sector intensity.</p>
+            <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2">Emergency Response</h1>
+            <p className="text-lg text-slate-500 font-medium">Please provide the details below for immediate assistance.</p>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-14 animate-fade-slide-up [animation-delay:150ms]">
-        {/* Resource Classification */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-12 animate-fade-slide-up [animation-delay:150ms]">
+        {/* Type Selection */}
         <div>
-          <div className="flex items-center gap-4 mb-8 ml-2">
-             <Signal className="w-5 h-5 text-interactive opacity-60" />
-             <label className="text-[12px] uppercase font-black tracking-[0.4em] text-white/30 leading-none">Resource Classification</label>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <label className="text-xs uppercase font-bold tracking-[0.3em] text-slate-400 ml-2 mb-6 block">Type of Emergency</label>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {emergencyTypes.map(type => (
               <button
                 type="button"
                 key={type.id}
                 onClick={() => { setSelectedType(type.id); setValue('type', type.id, { shouldValidate: true }); }}
-                className={`flex flex-col items-start gap-6 p-8 rounded-[32px] border transition-all duration-500 hover:scale-[1.02] active:scale-98 group overflow-hidden relative ${
+                className={`flex flex-col items-center justify-center gap-4 p-8 rounded-[32px] border transition-all duration-300 hover:shadow-xl group relative overflow-hidden ${
                   selectedType === type.id
-                    ? 'bg-white/5 border-interactive shadow-2xl shadow-interactive/10'
-                    : 'bg-white/2 border-white/5 hover:border-white/10 opacity-60 hover:opacity-100'
+                    ? 'bg-white border-indigo-500 ring-4 ring-indigo-500/5 shadow-2xl shadow-indigo-500/10'
+                    : 'bg-white border-slate-200 hover:border-slate-300'
                 }`}
               >
-                {selectedType === type.id && (
-                  <div className="absolute top-0 left-0 w-full h-1 bg-interactive" />
-                )}
-                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500" style={{ color: type.color }}>
-                  <type.icon className="w-8 h-8" />
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:scale-110 ${selectedType === type.id ? 'bg-indigo-50' : 'bg-slate-50'}`}>
+                  <type.icon className="w-7 h-7" style={{ color: selectedType === type.id ? '#4f46e5' : type.color }} />
                 </div>
-                <span className={`text-[14px] font-black uppercase tracking-[0.2em] ${selectedType === type.id ? 'text-white' : 'text-text-muted'}`}>{type.label}</span>
+                <span className={`text-[13px] font-bold ${selectedType === type.id ? 'text-indigo-600' : 'text-slate-600'}`}>{type.label}</span>
+                {selectedType === type.id && (
+                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-indigo-500" />
+                )}
               </button>
             ))}
           </div>
-          {errors.type && <p className="text-[12px] text-critical font-black uppercase tracking-widest mt-6 px-4">{errors.type.message}</p>}
+          {errors.type && <p className="text-xs text-rose-500 font-bold uppercase tracking-widest mt-6 px-4">{errors.type.message}</p>}
         </div>
 
-        {/* Transmission Parameters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="space-y-10">
+        {/* Detailed Info */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-12">
+          <div className="space-y-8">
             <div className="space-y-4">
-              <label className="text-[11px] uppercase font-black tracking-[0.4em] text-white/20 ml-2">Situation Manifest</label>
+              <label className="text-xs uppercase font-bold tracking-[0.3em] text-slate-400 ml-2">Describe the situation</label>
               <textarea
                 {...register('description')}
                 rows={6}
-                placeholder="INPUT_DETAILS: Defined occupants, medical urgency, environmental breaches..."
-                className="w-full bg-white/2 border border-white/5 rounded-[32px] px-8 py-7 text-[16px] text-white placeholder:text-white/10 focus:outline-none focus:border-interactive transition-all resize-none shadow-inner font-mono tracking-tighter"
+                placeholder="Ex: Water entering the first floor, families trapped on the roof..."
+                className="w-full bg-white border border-slate-200 rounded-[32px] px-8 py-6 text-lg text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all resize-none shadow-sm"
               />
-              {errors.description && <p className="text-[11px] text-critical font-black uppercase tracking-widest mt-2 ml-4">{errors.description.message}</p>}
+              {errors.description && <p className="text-xs text-rose-500 font-bold uppercase tracking-widest mt-2 ml-4">{errors.description.message}</p>}
             </div>
 
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
-                <label className="text-[11px] uppercase font-black tracking-[0.4em] text-white/20 ml-2">Node Size</label>
+                <label className="text-xs uppercase font-bold tracking-[0.3em] text-slate-400 ml-2">People Needing Help</label>
                 <div className="relative">
-                   <Users className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                   <Users className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                    <input
                     type="number"
                     {...register('peopleCount', { valueAsNumber: true })}
-                    className="w-full bg-white/2 border border-white/5 rounded-2xl pl-16 pr-6 py-4 text-[16px] text-white focus:outline-none focus:border-interactive transition-all font-mono font-bold"
+                    className="w-full bg-white border border-slate-200 rounded-2xl pl-16 pr-6 py-4 text-lg font-bold text-slate-900 focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
                   />
                 </div>
-                {errors.peopleCount && <p className="text-[11px] text-critical font-black uppercase tracking-widest mt-2 ml-4">{errors.peopleCount.message}</p>}
+                {errors.peopleCount && <p className="text-xs text-rose-500 font-bold uppercase tracking-widest mt-2 ml-4">{errors.peopleCount.message}</p>}
               </div>
               <div className="space-y-4">
-                <label className="text-[11px] uppercase font-black tracking-[0.4em] text-white/20 ml-2">Urgency Code</label>
+                <label className="text-xs uppercase font-bold tracking-[0.3em] text-slate-400 ml-2">Urgency Level</label>
                 <select
                   {...register('urgency')}
-                  className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-4 text-[13px] text-white font-black uppercase tracking-widest focus:outline-none focus:border-interactive h-[51px] appearance-none cursor-pointer"
+                  className="w-full bg-white border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold text-slate-700 focus:outline-none focus:border-indigo-500 h-[60px] cursor-pointer shadow-sm appearance-none"
                 >
-                  <option value="low">Alpha - Surveillance</option>
-                  <option value="medium">Beta - Support</option>
-                  <option value="high">Gamma - Rapid</option>
-                  <option value="critical">Omega - Crisis</option>
+                  <option value="low">Low - General support</option>
+                  <option value="medium">Medium - Required soon</option>
+                  <option value="high">High - Action required</option>
+                  <option value="critical">Critical - Immediate help</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <div className="space-y-10">
+          <div className="space-y-8">
              <div className="space-y-4">
-              <label className="text-[11px] uppercase font-black tracking-[0.4em] text-white/20 ml-2">Comm Link Identity</label>
+              <label className="text-xs uppercase font-bold tracking-[0.3em] text-slate-400 ml-2">Contact Number</label>
               <div className="relative group">
-                <Radio className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/40 group-focus-within:text-interactive transition-colors" />
+                <Radio className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                 <input 
                   {...register('contact')}
-                  className="w-full bg-white/2 border border-white/5 rounded-[24px] pl-16 pr-6 py-5 text-[15px] text-white focus:outline-none focus:border-interactive transition-all font-mono placeholder:text-white/10"
-                  placeholder="ENCRYPTED_ID / UPLINK"
+                  className="w-full bg-white border border-slate-200 rounded-2xl pl-16 pr-6 py-4 text-lg text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium placeholder:text-slate-300 shadow-sm"
+                  placeholder="Your phone number"
                 />
               </div>
-              {errors.contact && <p className="text-[11px] text-critical font-black uppercase tracking-widest mt-2 ml-4">{errors.contact.message}</p>}
+              {errors.contact && <p className="text-xs text-rose-500 font-bold uppercase tracking-widest mt-2 ml-4">{errors.contact.message}</p>}
             </div>
 
             <div className="space-y-4">
-              <label className="text-[11px] uppercase font-black tracking-[0.4em] text-white/20 ml-2">Vector Landmark</label>
+              <label className="text-xs uppercase font-bold tracking-[0.3em] text-slate-400 ml-2">Nearby Landmark</label>
               <div className="relative group">
-                <Navigation className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted/40 group-focus-within:text-interactive transition-colors" />
+                <Navigation className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                 <input 
                   {...register('landmark')}
-                  className="w-full bg-white/2 border border-white/5 rounded-[24px] pl-16 pr-6 py-5 text-[15px] text-white focus:outline-none focus:border-interactive transition-all font-medium placeholder:text-white/10"
-                  placeholder="Sector intersection / Structural beacon"
+                  className="w-full bg-white border border-slate-200 rounded-2xl pl-16 pr-6 py-4 text-lg text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium placeholder:text-slate-300 shadow-sm"
+                  placeholder="School, Shop, Bridge, etc."
                 />
               </div>
-              {errors.landmark && <p className="text-[11px] text-critical font-black uppercase tracking-widest mt-2 ml-4">{errors.landmark.message}</p>}
+              {errors.landmark && <p className="text-xs text-rose-500 font-bold uppercase tracking-widest mt-2 ml-4">{errors.landmark.message}</p>}
             </div>
 
-            <div className="soft-card p-8 bg-white/1 border-white/5 border relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform">
-                 <Cpu className="w-16 h-16 text-interactive" />
+            <div className="p-8 bg-indigo-600 rounded-[32px] text-white shadow-xl shadow-indigo-600/30 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+                 <MapPin className="w-16 h-16" />
               </div>
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Telemetry Sync</span>
-                <div className="w-2.5 h-2.5 rounded-full bg-safe shadow-[0_0_15px_#10b981] animate-pulse" />
-              </div>
-              <p className="text-[20px] font-mono font-bold text-white tracking-widest mb-3">
-                {position?.latitude?.toFixed(6) || '28.6139'}N, {position?.longitude?.toFixed(6) || '77.2090'}E
+              <p className="text-xs uppercase font-bold tracking-[0.3em] opacity-60 mb-3">Live Location Locked</p>
+              <p className="text-2xl font-bold tracking-tight mb-2">
+                {position?.latitude?.toFixed(4)}° N, {position?.longitude?.toFixed(4)}° E
               </p>
-              <p className="text-[10px] uppercase font-black text-text-muted/20 tracking-[0.5em]">Precision Coordinates Locked</p>
+              <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+                 <span className="text-xs font-bold opacity-80 uppercase tracking-widest">GPS Signal Active</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Global Broadcast */}
-        <div className="pt-10">
+        {/* Submit */}
+        <div className="pt-8">
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-8 rounded-[40px] bg-gradient-to-r from-critical to-rose-700 text-white font-black text-[20px] uppercase tracking-[0.4em] shadow-3xl shadow-critical/30 hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-8 group"
+            className="w-full py-8 rounded-[40px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl uppercase tracking-widest shadow-2xl shadow-indigo-600/30 hover:shadow-indigo-600/40 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-6 group"
           >
-            {loading ? <Loader2 className="w-10 h-10 animate-spin" /> : <ShieldAlert className="w-10 h-10 group-hover:scale-110 transition-transform" />}
-            {loading ? 'Transmitting Protocol...' : 'Activate Emergency Uplink'}
+            {loading ? <Loader2 className="w-10 h-10 animate-spin" /> : <ShieldAlert className="w-10 h-10" />}
+            {loading ? 'Sending Request...' : 'Send Emergency Request'}
           </button>
-          <div className="mt-12 flex flex-col items-center gap-6">
-             <div className="flex items-center gap-5 w-full max-w-[400px]">
-                <div className="h-px flex-1 bg-white/5" />
-                <span className="text-[10px] font-black text-text-muted/20 uppercase tracking-[0.5em] whitespace-nowrap">Grid Sync Required</span>
-                <div className="h-px flex-1 bg-white/5" />
-             </div>
-             <p className="text-[11px] text-text-muted/40 font-black uppercase tracking-[0.4em] max-w-lg text-center leading-relaxed">
-                By activating this uplink, you are broadcasted to the unified regional responders. Secure your perimeter and await tactical reinforcement.
-             </p>
-          </div>
+          
+          <p className="mt-8 text-center text-sm text-slate-400 font-medium max-w-lg mx-auto leading-relaxed">
+            By sending this request, you are alerting nearby authorities and rescue volunteers. Please keep your phone clear for incoming calls.
+          </p>
         </div>
       </form>
     </div>

@@ -18,11 +18,11 @@ const categoryIcons = {
 };
 
 const categoryColors = {
-  'water': '#38bdf8',
-  'medical': '#f43f5e',
-  'supplies': '#818cf8',
+  'water': '#0ea5e9',
+  'medical': '#ef4444',
+  'supplies': '#6366f1',
   'food': '#f59e0b',
-  'equipment': '#f59e0b'
+  'equipment': '#64748b'
 };
 
 export default function ResourcesPage() {
@@ -67,29 +67,29 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="p-12 lg:p-16 max-w-7xl mx-auto font-sans min-h-screen">
-      {/* Logistics Matrix Header */}
-      <div className="bg-white/2 backdrop-blur-3xl border border-white/5 rounded-[40px] p-12 mb-16 shadow-2xl relative overflow-hidden animate-fade-slide-up">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-interactive/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2" />
+    <div className="p-8 lg:p-12 max-w-7xl mx-auto min-h-screen bg-bg-primary">
+      {/* Header */}
+      <div className="bg-white border border-slate-200 rounded-[40px] p-10 lg:p-12 mb-12 shadow-xl shadow-slate-900/5 relative overflow-hidden animate-fade-slide-up">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-50 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 -z-1" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
-          <div className="flex items-center gap-10">
-            <div className="w-20 h-20 rounded-[30px] bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group">
-              <Gift className="w-10 h-10 text-interactive group-hover:scale-110 transition-transform duration-500 fill-interactive/10" />
+          <div className="flex items-center gap-8">
+            <div className="w-16 h-16 rounded-3xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+              <Gift className="w-8 h-8 text-indigo-600" />
             </div>
             <div>
-              <h1 className="text-4xl font-black text-white font-display tracking-tighter leading-none mb-4 uppercase">Logistics <span className="text-gradient-emerald">Matrix</span></h1>
-              <p className="text-[16px] text-text-muted font-medium tracking-tight opacity-70">Sector-wide provision coordination and supply chain synchronization terminal.</p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-1">Supply Coordination</h1>
+              <p className="text-slate-500 font-medium">Real-time inventory and resource allocation across all sectors.</p>
             </div>
           </div>
-          <div className="flex bg-white/2 p-4 rounded-[32px] border border-white/5 backdrop-blur-xl shadow-inner">
-            <div className="text-right pr-8 border-r border-white/5">
-              <p className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20 mb-2">Grid Sync</p>
-              <p className="text-[18px] font-mono font-bold text-white tracking-tighter uppercase">82% <span className="text-[12px] opacity-20 ml-2">Verified</span></p>
+          <div className="bg-slate-50 px-8 py-5 rounded-[32px] border border-slate-100 flex items-center divide-x divide-slate-200 shadow-sm">
+            <div className="pr-8">
+              <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Stock Status</p>
+              <p className="text-xl font-bold text-slate-900">82% <span className="text-xs text-emerald-500 font-bold ml-1">Normal</span></p>
             </div>
             <div className="pl-8 flex items-center">
-               <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
-                  <Activity className="w-6 h-6 text-interactive animate-pulse" />
+               <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center border border-slate-100 shadow-sm">
+                  <Activity className="w-5 h-5 text-indigo-600" />
                </div>
             </div>
           </div>
@@ -97,97 +97,93 @@ export default function ResourcesPage() {
       </div>
 
       {loading ? (
-        <div className="py-40 flex flex-col items-center justify-center animate-pulse">
-          <div className="relative w-20 h-20 mb-10">
-             <Loader2 className="w-20 h-20 text-interactive animate-spin opacity-20" />
-             <div className="absolute inset-0 border-t-2 border-interactive rounded-full animate-spin-slow" />
+        <div className="py-40 flex flex-col items-center justify-center">
+          <div className="relative w-16 h-16 mb-6">
+             <div className="absolute inset-0 rounded-full border-2 border-slate-100" />
+             <div className="absolute inset-0 rounded-full border-t-2 border-indigo-600 animate-spin" />
           </div>
-          <span className="text-[12px] font-black text-text-muted/40 uppercase tracking-[0.5em]">Calculating Supply Flow...</span>
+          <span className="text-sm font-bold text-slate-400 uppercase tracking-widest animate-pulse">Syncing Inventory...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {resources.map((res, i) => {
             const Icon = (categoryIcons as any)[res.category] || Package;
-            const color = (categoryColors as any)[res.category] || '#f59e0b';
+            const color = (categoryColors as any)[res.category] || '#6366f1';
             const progress = (res.pledged / res.needed) * 100;
             const isSuccess = success === res.id;
 
             return (
               <div 
                 key={res.id} 
-                className="soft-card group animate-fade-slide-up bg-white/2 border-white/5 hover:border-white/10 hover:bg-white/3 transition-all overflow-hidden rounded-[40px]"
+                className="bg-white border border-slate-200 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all duration-300 rounded-[40px] p-10 group"
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="p-10">
-                  <div className="flex items-start justify-between mb-12">
-                    <div className="flex items-center gap-8">
-                      <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500" style={{ color }}>
-                        <Icon className="w-8 h-8" />
-                      </div>
-                      <div>
-                        <h3 className="text-[22px] font-black text-white mb-3 font-display tracking-tight leading-none group-hover:text-interactive transition-colors uppercase">{res.name}</h3>
-                        <div className="flex items-center gap-4">
-                           <span className="text-[10px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-xl bg-white/2 border border-white/5" style={{ color }}>{res.category}</span>
-                           <div className="flex items-center gap-3 px-3 py-1 rounded-xl bg-critical/5 border border-critical/10 shadow-inner">
-                              <TargetIcon className="w-3.5 h-3.5 text-critical/60" />
-                              <span className="text-[9px] font-black text-critical uppercase tracking-[0.3em] leading-none">CRITICAL_ASSET</span>
-                           </div>
-                        </div>
+                <div className="flex items-start justify-between mb-10">
+                  <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:scale-110 transition-transform" style={{ color }}>
+                      <Icon className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mb-2">{res.name}</h3>
+                      <div className="flex items-center gap-3">
+                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg border border-slate-100 bg-slate-50 text-slate-500">{res.category}</span>
+                         {progress < 30 && (
+                            <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-100">Low Stock</span>
+                         )}
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Provision Flux Visualizer */}
-                  <div className="space-y-6 mb-12">
-                    <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.4em] text-white/20 mb-3 ml-2">
-                       <span>Manifest Spectrum</span>
-                       <span className="text-white font-mono tracking-tighter font-bold text-[15px]">{Math.min(100, Math.round(progress))}%</span>
-                    </div>
-                    <div className="h-2.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px] shadow-inner">
-                      <div 
-                        className="h-full transition-all duration-1000 shadow-[0_0_20px_currentColor] rounded-full" 
-                        style={{ width: `${progress}%`, backgroundColor: color, color: color }} 
-                      />
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] font-mono font-bold text-white/10 tracking-[0.3em] uppercase px-2">
-                        <span>{res.pledged} LOGGED_UNITS</span>
-                        <span>{res.needed} QUOTA_TARGET</span>
-                    </div>
+                {/* Progress */}
+                <div className="space-y-4 mb-10">
+                  <div className="flex items-center justify-between">
+                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Fulfillment</span>
+                     <span className="text-sm font-bold text-slate-900">{Math.min(100, Math.round(progress))}%</span>
                   </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full transition-all duration-1000 rounded-full" 
+                      style={{ width: `${progress}%`, backgroundColor: color }} 
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                      <span>{res.pledged} Units Provided</span>
+                      <span>Target: {res.needed}</span>
+                  </div>
+                </div>
 
-                  <div className="pt-10 border-t border-white/5 flex items-center justify-between gap-8">
-                    <div className="flex items-center bg-white/2 rounded-[24px] border border-white/5 p-1.5 shadow-inner">
-                      <button 
-                        onClick={() => updateAmount(res.id, -1)}
-                        className="p-4 hover:text-interactive text-white/10 transition-colors"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span className="w-14 text-center font-mono font-black text-[20px] text-white tracking-widest">
-                        {pledgeAmounts[res.id] || 1}
-                      </span>
-                      <button 
-                        onClick={() => updateAmount(res.id, 1)}
-                        className="p-4 hover:text-interactive text-white/10 transition-colors"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-
+                <div className="pt-8 border-t border-slate-50 flex items-center justify-between gap-6">
+                  <div className="flex items-center bg-slate-50 rounded-2xl border border-slate-100 p-1 shadow-sm">
                     <button 
-                      onClick={() => handlePledge(res.id)}
-                      disabled={isSuccess}
-                      className={`flex-1 flex items-center justify-center gap-6 py-5 rounded-[28px] font-black text-[14px] uppercase tracking-[0.4em] transition-all duration-500 overflow-hidden relative ${
-                        isSuccess 
-                        ? 'bg-safe/5 text-safe border border-safe/20' 
-                        : 'bg-interactive text-bg-primary shadow-3xl shadow-interactive/30 hover:scale-[1.02] active:scale-95'
-                      }`}
+                      onClick={() => updateAmount(res.id, -1)}
+                      className="p-3 text-slate-400 hover:text-indigo-600 transition-colors"
                     >
-                       <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {isSuccess ? <CheckCircle2 className="w-6 h-6" /> : <ShieldCheck className="w-6 h-6 group-hover:scale-110 transition-transform relative z-10" />}
-                      <span className="relative z-10">{isSuccess ? 'PLEDGE_SYNCED' : 'AUTHORIZE_PLEDGE'}</span>
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="w-10 text-center font-bold text-lg text-slate-900">
+                      {pledgeAmounts[res.id] || 1}
+                    </span>
+                    <button 
+                      onClick={() => updateAmount(res.id, 1)}
+                      className="p-3 text-slate-300 hover:text-indigo-600 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
                     </button>
                   </div>
+
+                  <button 
+                    onClick={() => handlePledge(res.id)}
+                    disabled={isSuccess}
+                    className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${
+                      isSuccess 
+                      ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
+                      : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95'
+                    }`}
+                  >
+                    {isSuccess ? <CheckCircle2 className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5 transition-transform group-hover:scale-110" />}
+                    <span>{isSuccess ? 'Pledged' : 'Support Supply'}</span>
+                  </button>
                 </div>
               </div>
             );
@@ -195,21 +191,16 @@ export default function ResourcesPage() {
         </div>
       )}
 
-      {/* Logistics Protocol Terminal */}
-      <div className="mt-20 p-12 rounded-[48px] bg-white/1 border border-white/5 flex items-start gap-12 animate-fade-slide-up relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-2 h-full bg-interactive opacity-20 group-hover:opacity-100 transition-opacity" />
-        <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center shrink-0 border border-white/10 shadow-inner group-hover:rotate-12 transition-transform duration-500">
-           <AlertCircle className="w-8 h-8 text-interactive/40 group-hover:text-interactive transition-colors" />
+      {/* Info Card */}
+      <div className="mt-16 p-10 rounded-[48px] bg-slate-50 border border-slate-100 flex items-start gap-8 animate-fade-slide-up relative overflow-hidden group">
+        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shrink-0 border border-slate-200 shadow-sm group-hover:rotate-12 transition-transform">
+           <AlertCircle className="w-7 h-7 text-indigo-500" />
         </div>
         <div>
-          <h4 className="text-[18px] font-black text-white uppercase tracking-[0.4em] mb-6">Unified Logistics Advisory</h4>
-          <p className="text-[15px] text-text-muted/60 leading-relaxed font-medium uppercase tracking-tighter italic">
-             By authorizing a supply pledge, you establish an active node on the regional provision matrix. Sector command will calibrate a collection vector based on real-time urgency and logistical capability. Node integrity is continuously monitored via multispectral relay.
+          <h4 className="text-lg font-bold text-slate-900 mb-2">Supply Commitment Policy</h4>
+          <p className="text-slate-500 leading-relaxed font-medium">
+             By committing support, you help us coordinate aid more effectively. Our team will verify each pledge and contact you to arrange collection or delivery from coordinated hubs. Thank you for your contribution.
           </p>
-          <div className="mt-8 flex items-center gap-4 text-[11px] font-mono font-black text-white/10 uppercase tracking-[0.3em]">
-             <Cpu className="w-4 h-4" />
-             <span>Uplink Frequency: 1420MHz // Auth_Gate: OPEN </span>
-          </div>
         </div>
       </div>
     </div>

@@ -7,8 +7,22 @@ import {
   Heart, ShieldCheck, UserPlus, Search, 
   Phone, MapPin, CheckCircle2, AlertCircle,
   Loader2, X, Users, MessageSquare,
-  ArrowRight, Activity, Signal, Navigation, Target, Cpu
+  ArrowRight, Activity, Signal, Navigation, Target, Cpu, Bot, Send
 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Custom marker for family nodes
+const familyIcon = L.divIcon({
+  className: 'custom-div-icon',
+  html: `<div class="relative flex items-center justify-center">
+          <div class="absolute w-8 h-8 rounded-full bg-indigo-500 opacity-20 animate-ping"></div>
+          <div class="w-4 h-4 rounded-full bg-indigo-600 border-2 border-white shadow-lg"></div>
+         </div>`,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+});
 
 export default function FamilyPage() {
   const { user } = useAuthStore();
@@ -19,6 +33,12 @@ export default function FamilyPage() {
   const [markingSafe, setMarkingSafe] = useState(false);
   const [safeMessage, setSafeMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // AI Assistant State
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'ai', content: string }[]>([]);
+  const [isChatLoading, setIsChatLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -57,116 +77,197 @@ export default function FamilyPage() {
     }
   };
 
+  const handleChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatMessage.trim()) return;
+
+    const userMsg = chatMessage;
+    setChatHistory(prev => [...prev, { role: 'user', content: userMsg }]);
+    setChatMessage('');
+    setIsChatLoading(true);
+
+    try {
+      const res = await api.post('/ai-risk/chat', { 
+        message: userMsg,
+        context: 'Family safety and social coordination support'
+      });
+      setChatHistory(prev => [...prev, { role: 'ai', content: res.data.response }]);
+    } catch (err) {
+      console.error('AI Chat Error:', err);
+      setChatHistory(prev => [...prev, { role: 'ai', content: 'I am having trouble connecting right now. Please try again in a moment.' }]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
   const myStatus = safetyStatuses.find(s => s.userId === user?.id);
 
   return (
-    <div className="p-12 lg:p-16 max-w-7xl mx-auto font-sans min-h-screen">
-      {/* Kinship Grid Header */}
-      <div className="bg-white/2 backdrop-blur-3xl border border-white/5 rounded-[40px] p-12 mb-16 shadow-2xl relative overflow-hidden animate-fade-slide-up">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-interactive/5 blur-[150px] rounded-full -translate-y-1/2 -translate-x-1/2" />
+    <div className="p-8 lg:p-12 max-w-7xl mx-auto min-h-screen bg-bg-primary">
+      {/* Header */}
+      <div className="bg-white border border-slate-200 rounded-[40px] p-10 lg:p-12 mb-12 shadow-xl shadow-slate-900/5 relative overflow-hidden animate-fade-slide-up">
+        <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-indigo-50 blur-[100px] rounded-full -translate-y-1/2 -translate-x-1/2 -z-1" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
-          <div className="flex items-center gap-10">
-            <div className="w-20 h-20 rounded-[30px] bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group">
-              <Heart className="w-10 h-10 text-interactive group-hover:scale-110 transition-transform duration-500 fill-interactive/10" />
+          <div className="flex items-center gap-8 text-center md:text-left">
+            <div className="w-16 h-16 rounded-3xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+              <Heart className="w-8 h-8 text-indigo-600" />
             </div>
             <div>
-              <h1 className="text-4xl font-black text-white font-display tracking-tighter leading-none mb-4 uppercase">Kinship <span className="text-gradient-emerald">Grid</span></h1>
-              <p className="text-[16px] text-text-muted font-medium tracking-tight opacity-70">Secured proximity uplink and welfare tracking for primary kinship nodes.</p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Family & Friends</h1>
+              <p className="text-slate-500 font-medium">Keep track of your loved ones and share your safety status.</p>
             </div>
           </div>
           
-          <div className="flex bg-white/2 p-4 rounded-[32px] border border-white/5 backdrop-blur-xl shadow-inner">
-            <div className="px-8 py-2 text-center border-r border-white/5">
-              <span className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20 block mb-2">Sync Status</span>
-              <p className="text-[18px] font-mono font-bold text-safe uppercase tracking-tighter">Live_Uplink</p>
+          <div className="flex bg-slate-50 p-2 rounded-[32px] border border-slate-100 shadow-sm divide-x divide-slate-200">
+            <div className="px-8 py-2 text-center">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-1">Status</span>
+              <p className="text-lg font-bold text-emerald-600">Connected</p>
             </div>
             <div className="px-8 py-2 text-center">
-              <span className="text-[10px] uppercase font-black tracking-[0.4em] text-white/20 block mb-2">Linked Nodes</span>
-              <p className="text-[18px] font-mono font-bold text-interactive tracking-tighter uppercase">{family.length + 1}</p>
+              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-1">Linked</span>
+              <p className="text-lg font-bold text-indigo-600">{family.length + 1}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_440px] gap-16">
-        <div className="space-y-16">
-          {/* Status Burst Terminal */}
-          <div className="soft-card p-12 border-white/5 bg-white/2 shadow-[0_40px_100px_rgba(0,0,0,0.7)] relative overflow-hidden group rounded-[48px]">
-            <div className="absolute top-0 right-0 p-10 pointer-events-none opacity-5 group-hover:opacity-10 transition-opacity">
-               <Signal className="w-24 h-24 text-interactive" />
+      {/* Map */}
+      <div className="bg-white border border-slate-200 rounded-[48px] overflow-hidden mb-12 h-[500px] relative shadow-xl shadow-slate-900/5 animate-fade-slide-up [animation-delay:200ms]">
+        <div className="absolute top-6 left-6 z-[1000] pointer-events-none">
+          <div className="bg-white/80 backdrop-blur-md px-6 py-4 rounded-3xl border border-white/20 shadow-xl pointer-events-auto">
+             <div className="flex items-center gap-3 mb-1">
+                <Navigation className="w-4 h-4 text-indigo-600 animate-pulse" />
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Safety Map</span>
+             </div>
+             <p className="text-sm font-bold text-slate-900">Registered Locations</p>
+          </div>
+        </div>
+
+        <MapContainer 
+          center={[20.5937, 78.9629]} 
+          zoom={5} 
+          className="w-full h-full"
+          zoomControl={false}
+        >
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            attribution='&copy; OSM'
+          />
+          
+          {position && (
+            <Marker position={[position.latitude, position.longitude]} icon={familyIcon}>
+              <Popup className="premium-popup">
+                <div className="p-4 min-w-[150px]">
+                  <p className="text-xs font-bold text-indigo-600 uppercase mb-2">Your Location</p>
+                  <p className="text-[10px] text-slate-400 font-medium">Lat: {position.latitude.toFixed(4)}</p>
+                  <p className="text-[10px] text-slate-400 font-medium">Lng: {position.longitude.toFixed(4)}</p>
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
+          {safetyStatuses.map(status => (
+            status.latitude && status.longitude && (
+              <Marker key={status.id} position={[status.latitude, status.longitude]} icon={familyIcon}>
+                <Popup className="premium-popup">
+                  <div className="p-4 min-w-[180px]">
+                    <h4 className="text-lg font-bold text-slate-900 mb-1">
+                      {family.find(f => f.userId === status.userId)?.name || 'Linked Member'}
+                    </h4>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className={`w-2 h-2 rounded-full ${status.isSafe ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                        {status.isSafe ? 'I am safe' : 'Needs assistance'}
+                      </span>
+                    </div>
+                    {status.message && <p className="text-sm text-slate-500 italic mb-3">"{status.message}"</p>}
+                    <p className="text-[9px] font-bold text-slate-400 uppercase">Updated: {new Date(status.updatedAt).toLocaleTimeString()}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            )
+          ))}
+        </MapContainer>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
+        <div className="space-y-12">
+          {/* Status Update */}
+          <div className="bg-white border border-slate-200 rounded-[48px] p-10 lg:p-12 shadow-xl shadow-slate-900/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:scale-110 transition-transform">
+               <Signal className="w-32 h-32 text-indigo-600" />
             </div>
             
-            <div className="flex items-center gap-6 mb-10">
-              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
-                 <ShieldCheck className="w-8 h-8 text-interactive" />
+            <div className="flex items-center gap-6 mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shadow-sm">
+                 <ShieldCheck className="w-7 h-7 text-indigo-600" />
               </div>
-              <h2 className="text-[22px] font-black text-white font-display tracking-tighter uppercase">Broadcast Personal Telemetry</h2>
+              <h2 className="text-2xl font-bold text-slate-900">Update My Status</h2>
             </div>
             
-            <div className="space-y-8">
+            <div className="space-y-6">
               <textarea 
                 value={safeMessage}
                 onChange={(e) => setSafeMessage(e.target.value)}
-                placeholder="INPUT_LOG: Define current structural stability, medical requirements, or mission intent..."
-                className="w-full bg-white/2 border border-white/5 rounded-[40px] px-10 py-8 text-[16px] text-white placeholder:text-white/10 focus:outline-none focus:border-interactive transition-all resize-none shadow-inner font-mono tracking-tighter uppercase"
-                rows={5}
+                placeholder="Share a quick update with your family (e.g., 'At the community center', 'Staying with friends')"
+                className="w-full bg-slate-50 border border-slate-100 rounded-[32px] px-8 py-6 text-lg text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all resize-none shadow-sm"
+                rows={4}
               />
               
-              <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button 
                   onClick={() => handleMarkSafe(true)}
                   disabled={markingSafe}
-                  className="flex-1 py-6 rounded-[28px] bg-interactive text-bg-primary font-black text-[15px] uppercase tracking-[0.3em] shadow-3xl shadow-interactive/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-5 disabled:opacity-50 group"
+                  className="flex-1 py-5 rounded-2xl bg-indigo-600 text-white font-bold text-lg shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 group"
                 >
-                  {markingSafe ? <Loader2 className="w-6 h-6 animate-spin" /> : <CheckCircle2 className="w-6 h-6 group-hover:scale-110 transition-transform" />}
-                  Authorize Safe Signal
+                  {markingSafe ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5 group-hover:scale-110 transition-transform" />}
+                  I am Safe
                 </button>
                 <button 
                   onClick={() => handleMarkSafe(false)}
                   disabled={markingSafe}
-                  className="px-12 py-6 rounded-[28px] border border-critical/40 bg-critical/5 text-critical font-black text-[15px] uppercase tracking-[0.3em] hover:bg-critical/10 transition-all disabled:opacity-50"
+                  className="px-10 py-5 rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 font-bold hover:bg-rose-100 transition-all disabled:opacity-50"
                 >
-                  Request Link
+                  I need help
                 </button>
               </div>
               
               {myStatus && (
-                <div className="pt-8 flex items-center justify-between border-t border-white/5">
-                   <div className="flex items-center gap-4">
-                      <div className={`w-2.5 h-2.5 rounded-full shadow-[0_0_15px_currentColor] ${myStatus.isSafe ? 'text-safe animate-pulse' : 'text-critical animate-ping'}`} style={{ backgroundColor: 'currentColor' }} />
-                      <span className="text-[12px] font-black text-text-muted/30 uppercase tracking-[0.3em]">
-                        Last Sync: {new Date(myStatus.updatedAt).toLocaleTimeString()} // LOG_01
+                <div className="pt-6 flex items-center justify-between border-t border-slate-50">
+                   <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${myStatus.isSafe ? 'bg-emerald-500' : 'bg-rose-500'} animate-pulse`} />
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                        Last update: {new Date(myStatus.updatedAt).toLocaleTimeString()}
                       </span>
                    </div>
-                   <span className="text-[11px] font-mono font-bold text-white/10 uppercase tracking-widest whitespace-nowrap">NODE_REF: {myStatus.id.substring(0,8).toUpperCase()}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Trusted Node Registry */}
-          <div className="space-y-10">
-            <div className="flex items-center justify-between px-6">
-              <div className="flex items-center gap-4">
-                 <Users className="w-5 h-5 text-interactive opacity-40" />
-                 <h3 className="text-[11px] uppercase tracking-[0.4em] font-black text-white/20">Active Kinship Records</h3>
+          {/* Members List */}
+          <div className="space-y-8">
+            <div className="flex items-center justify-between px-4">
+              <div className="flex items-center gap-3">
+                 <Users className="w-5 h-5 text-slate-400" />
+                 <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-slate-400">Connected Members</h3>
               </div>
-              <button className="flex items-center gap-4 text-[11px] font-black text-interactive uppercase tracking-[0.4em] hover:text-white transition-all group">
-                <UserPlus className="w-4 h-4 group-hover:rotate-[90deg] transition-transform" /> Initialize Link
+              <button className="flex items-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-widest hover:text-indigo-700 transition-all group">
+                <UserPlus className="w-4 h-4 group-hover:scale-110 transition-transform" /> Add Member
               </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
+            <div className="grid grid-cols-1 gap-6">
               {loading ? (
                 <div className="py-24 flex flex-col items-center">
-                  <Loader2 className="w-12 h-12 text-interactive animate-spin mb-6 opacity-20" />
-                  <span className="text-[12px] font-black text-text-muted/40 uppercase tracking-[0.5em]">Synchronizing Peripheral Nodes...</span>
+                  <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+                  <span className="text-sm font-bold text-slate-400 uppercase tracking-widest animate-pulse">Syncing...</span>
                 </div>
               ) : family.length === 0 ? (
-                <div className="soft-card p-20 text-center border border-dashed border-white/5 bg-white/1 rounded-[48px]">
-                  <Cpu className="w-20 h-20 text-white/5 mx-auto mb-8" />
-                  <p className="text-white/10 font-black text-[16px] uppercase tracking-[0.4em]">Primary circle uninitialized</p>
+                <div className="bg-white border border-dashed border-slate-200 p-16 text-center rounded-[48px]">
+                  <Users className="w-16 h-16 text-slate-100 mx-auto mb-6" />
+                  <p className="text-slate-300 font-bold uppercase tracking-widest">No members added yet</p>
                 </div>
               ) : (
                 family.map((member, i) => {
@@ -174,29 +275,28 @@ export default function FamilyPage() {
                   return (
                     <div 
                       key={member.id} 
-                      className="soft-card group animate-fade-slide-up bg-white/2 p-8 flex items-center justify-between border-white/5 hover:border-white/10 transition-all rounded-[40px]"
+                      className="bg-white p-6 lg:p-8 flex items-center justify-between border border-slate-200 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all rounded-[32px] group"
                       style={{ animationDelay: `${i * 100}ms` }}
                     >
-                      <div className="flex items-center gap-8">
-                        <div className="w-20 h-20 rounded-[28px] bg-white/5 border border-white/10 flex items-center justify-center shadow-inner group-hover:scale-110 transition-all overflow-hidden relative">
-                           <div className="absolute inset-0 bg-interactive/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                           <span className="text-3xl font-black text-white/40 group-hover:text-interactive relative z-10">{member.name[0]}</span>
+                      <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform overflow-hidden relative">
+                           <span className="text-2xl font-bold text-slate-300 group-hover:text-indigo-600 transition-colors uppercase">{member.name[0]}</span>
                         </div>
                         <div>
-                          <div className="flex items-center gap-5 mb-3">
-                            <h4 className="text-[20px] font-black text-white uppercase tracking-tighter leading-none">{member.name}</h4>
-                            <span className="text-[10px] font-black px-3 py-1 rounded-xl bg-white/2 border border-white/5 text-white/20 uppercase tracking-[0.2em]">{member.relation}</span>
+                          <div className="flex items-center gap-4 mb-1">
+                            <h4 className="text-lg font-bold text-slate-900">{member.name}</h4>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-slate-100 bg-slate-50 text-slate-400 uppercase">{member.relation}</span>
                           </div>
-                          <div className="flex items-center gap-8">
-                            <div className="flex items-center gap-3 text-white/20">
-                              <Phone className="w-4 h-4" />
-                              <span className="text-[12px] font-mono font-bold tracking-tighter uppercase">{member.phone}</span>
+                          <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2 text-slate-400">
+                              <Phone className="w-3.5 h-3.5" />
+                              <span className="text-xs font-bold">{member.phone}</span>
                             </div>
                             {status && (
-                              <div className="flex items-center gap-4">
-                                <Activity className={`w-4 h-4 ${status.isSafe ? 'text-safe' : 'text-critical'}`} />
-                                <span className={`text-[11px] font-black uppercase tracking-[0.3em] ${status.isSafe ? 'text-safe/40' : 'text-critical/40'}`}>
-                                  {status.isSafe ? 'SIGNAL_STABLE' : 'BREACH_DETECTED'}
+                              <div className="flex items-center gap-2">
+                                <Activity className={`w-3.5 h-3.5 ${status.isSafe ? 'text-emerald-500' : 'text-rose-500'}`} />
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${status.isSafe ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                  {status.isSafe ? 'Safe' : 'Needs Help'}
                                 </span>
                               </div>
                             )}
@@ -204,12 +304,12 @@ export default function FamilyPage() {
                         </div>
                       </div>
                       
-                      <div className="flex gap-4">
-                        <button className="w-14 h-14 rounded-[22px] bg-white/2 border border-white/5 text-white/20 hover:text-interactive hover:border-interactive transition-all group/btn shadow-inner flex items-center justify-center">
-                          <MessageSquare className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                      <div className="flex gap-3">
+                        <button className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 hover:text-indigo-600 hover:border-indigo-100 hover:bg-white transition-all shadow-sm flex items-center justify-center">
+                          <MessageSquare className="w-5 h-5" />
                         </button>
-                        <button className="w-14 h-14 rounded-[22px] bg-white/2 border border-white/5 text-white/20 hover:text-critical hover:border-critical transition-all group/btn shadow-inner flex items-center justify-center">
-                          <Target className="w-5 h-5 group-hover/btn:scale-110 transition-all" />
+                        <button className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 hover:text-rose-500 hover:border-rose-100 hover:bg-white transition-all shadow-sm flex items-center justify-center">
+                          <Target className="w-5 h-5" />
                         </button>
                       </div>
                     </div>
@@ -220,49 +320,142 @@ export default function FamilyPage() {
           </div>
         </div>
 
-        {/* Global Coordination Advisory */}
-        <div className="space-y-12">
-           <div className="soft-card glass-panel bg-white/1 p-12 sticky top-40 border-white/5 shadow-2xl rounded-[48px] overflow-hidden">
-              <div className="absolute top-0 right-0 p-10 opacity-5">
-                 <Cpu className="w-24 h-24 text-interactive" />
+        {/* Sidebar Support */}
+        <div className="space-y-8">
+           <div className="bg-white p-10 border border-slate-200 shadow-xl shadow-slate-900/5 rounded-[48px] overflow-hidden sticky top-32">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+                 <Cpu className="w-24 h-24 text-indigo-600" />
               </div>
-              <h3 className="text-[20px] font-black text-white font-display mb-12 tracking-tight flex items-center gap-6 uppercase relative z-10">
-                 <ShieldCheck className="w-6 h-6 text-interactive" /> Link Protocols
+              <h3 className="text-xl font-bold text-slate-900 mb-10 flex items-center gap-4">
+                 <ShieldCheck className="w-6 h-6 text-indigo-600" /> Keep Safe
               </h3>
-              <div className="space-y-12 relative z-10">
+              <div className="space-y-10">
                 {[
-                  { title: "ID_AUTH_CODE", desc: "Execute specialized safe-word authentication for biometric identity lock in compromised sectors." },
-                  { title: "GRID_SYNC_POINT", desc: "Define a primary sanctuary node for physical reconnection in severe telemetry outage scenarios." },
-                  { title: "LOAD_OPTIMIZER", desc: "Minimize uplink durations to preserve portable power cycles during regional grid failure." },
-                  { title: "NEURAL_PROXIMITY", desc: "Enable passive L-Band tracking for localized connection detection in high-interfere zones." }
+                  { title: "Safe Words", desc: "Decide on a family 'safe word' to confirm identities in confusing situations." },
+                  { title: "Meeting Point", desc: "Agree on a physical place to meet if phone networks go down." },
+                  { title: "Save Battery", desc: "Update your status quickly and keep your phone in low-power mode." },
+                  { title: "Location Sharing", desc: "Allow localized tracking so family can find you even without a call." }
                 ].map((tip, i) => (
-                  <div key={i} className="flex gap-8 group">
-                    <div className="w-14 h-14 rounded-2xl bg-white/2 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-interactive group-hover:bg-white/5 transition-all duration-500">
-                      <span className="text-interactive/60 font-black text-[18px] font-mono group-hover:text-interactive transition-colors">{i+1}</span>
+                  <div key={i} className="flex gap-6 group">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-all">
+                      <span className="text-slate-300 font-bold text-lg group-hover:text-indigo-600 transition-colors">{i+1}</span>
                     </div>
                     <div>
-                      <h4 className="text-[14px] font-black text-white uppercase tracking-[0.2em] mb-3 group-hover:text-interactive transition-colors">{tip.title}</h4>
-                      <p className="text-[14px] text-text-muted/60 leading-relaxed font-medium uppercase tracking-tight italic">{tip.desc}</p>
+                      <h4 className="text-sm font-bold text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors">{tip.title}</h4>
+                      <p className="text-sm text-slate-500 leading-relaxed font-medium">{tip.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-16 p-10 rounded-[40px] bg-white/2 border border-white/5 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-2 h-full bg-safe shadow-[0_0_20px_#10b981] opacity-40 group-hover:opacity-100 transition-opacity" />
-                <div className="flex items-center gap-4 mb-6 relative z-10">
-                  <div className="w-2.5 h-2.5 rounded-full bg-safe animate-pulse shadow-[0_0_15px_#10b981]" />
-                  <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.4em]">Grid Uplink: Active</span>
+              <div className="mt-12 p-8 rounded-[32px] bg-indigo-600 text-white relative overflow-hidden group shadow-xl shadow-indigo-600/30">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">Network Active</span>
                 </div>
-                <p className="text-[14px] text-text-muted/60 leading-relaxed font-medium uppercase tracking-tighter relative z-10">
-                  Global sector connectivity verified. Node latency: <span className="text-interactive font-mono">14MS</span>. Encryption: <span className="text-interactive font-mono">SHA-512_SYNC</span>.
+                <p className="text-sm font-medium leading-relaxed opacity-90">
+                  Global satellite connectivity is currently stable. Latency: <span className="font-bold">14ms</span>.
                 </p>
-                <div className="absolute bottom-0 right-0 p-8 opacity-5">
-                   <Navigation className="w-16 h-16 text-safe" />
+                <div className="absolute bottom-0 right-0 p-6 opacity-10">
+                   <Navigation className="w-12 h-12" />
                 </div>
               </div>
            </div>
         </div>
+      </div>
+
+      {/* AI Assistant */}
+      <div className="fixed bottom-10 right-10 z-[2000] flex flex-col items-end gap-6">
+        {isAiOpen && (
+          <div className="w-[400px] h-[600px] bg-white/95 backdrop-blur-xl border border-slate-200 rounded-[40px] shadow-[0_40px_100px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col animate-fade-slide-up">
+            <div className="p-8 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                  <Bot className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Safety Assistant</h3>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Always here for you</span>
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => setIsAiOpen(false)} className="bg-white w-10 h-10 rounded-xl border border-slate-100 text-slate-400 hover:text-rose-500 transition-all flex items-center justify-center shadow-sm">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth">
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 text-indigo-600" />
+                </div>
+                <div className="bg-slate-50 border border-slate-100 rounded-2xl rounded-tl-none p-5 text-sm text-slate-600 leading-relaxed font-medium">
+                  Hello! I'm here to help you stay connected with your family and ensure everyone is safe. You can ask me about regional risks or how to coordinate with your loved ones.
+                </div>
+              </div>
+              
+              {chatHistory.map((msg, i) => (
+                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`w-8 h-8 rounded-xl border shrink-0 flex items-center justify-center shadow-sm ${
+                    msg.role === 'user' ? 'bg-indigo-600 border-indigo-500' : 'bg-white border-slate-200'
+                  }`}>
+                    {msg.role === 'user' ? <Users className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-indigo-600" />}
+                  </div>
+                  <div className={`rounded-2xl p-5 text-sm leading-relaxed font-medium shadow-sm transition-all ${
+                    msg.role === 'user' 
+                      ? 'bg-indigo-600 text-white rounded-tr-none' 
+                      : 'bg-slate-50 border border-slate-100 text-slate-600 rounded-tl-none'
+                  }`}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {isChatLoading && (
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                    <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
+                  </div>
+                  <div className="bg-slate-50 border border-slate-100 rounded-2xl rounded-tl-none p-5 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    Thinking...
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={handleChat} className="p-8 border-t border-slate-100">
+              <div className="relative">
+                <input 
+                  type="text" 
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="Ask me anything..."
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all pr-14"
+                />
+                <button 
+                  type="submit"
+                  disabled={isChatLoading || !chatMessage.trim()}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        <button 
+          onClick={() => setIsAiOpen(!isAiOpen)}
+          className={`w-16 h-16 lg:w-20 lg:h-20 rounded-[28px] lg:rounded-[32px] shadow-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-90 relative group overflow-hidden ${
+            isAiOpen ? 'bg-white border border-slate-200 rotate-90' : 'bg-indigo-600 border border-indigo-500 shadow-indigo-600/30'
+          }`}
+        >
+          {isAiOpen ? <X className="w-8 h-8 text-slate-900" /> : <Bot className="w-8 h-8 text-white" />}
+          {!isAiOpen && (
+            <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+          )}
+        </button>
       </div>
     </div>
   );

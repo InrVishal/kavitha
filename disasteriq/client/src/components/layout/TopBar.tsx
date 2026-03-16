@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 
 const alertTicker = [
-  "SYSTEM: Primary evacuation corridor mapped for Northern Sector.",
-  "NETWORK: Uplink status optimal. 99.9% node connectivity.",
-  "INTEL: Tactical resources mobilized in response to Sector 8 breach.",
-  "STATUS: Quantum modeling synchronized. 6h prediction window active."
+  "Note: Safety routes have been updated for the Southern Corridor.",
+  "System connectivity is stable and performing well.",
+  "New emergency supplies are arriving at local community centers.",
+  "Weather forecasts have been updated for the next 24 hours."
 ];
 
 export default function TopBar() {
@@ -21,7 +21,7 @@ export default function TopBar() {
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
-    const ticker = setInterval(() => setTickerIndex(i => (i + 1) % alertTicker.length), 6000);
+    const ticker = setInterval(() => setTickerIndex(i => (i + 1) % alertTicker.length), 5000);
     
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -38,62 +38,58 @@ export default function TopBar() {
   }, []);
 
   return (
-    <div className="h-[64px] border-b border-white/5 bg-bg-panel/40 backdrop-blur-xl flex items-center justify-between px-10 z-30 sticky top-0 font-sans">
-      {/* Tactical Feed */}
-      <div className="flex-1 max-w-2xl overflow-hidden hidden lg:flex items-center gap-8">
-        <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
-          <Activity className="w-3.5 h-3.5 text-interactive" />
-          <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] leading-none font-mono">Operations Feed</span>
+    <div className="h-[72px] border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 z-30 sticky top-0">
+      {/* Live Feed */}
+      <div className="flex-1 max-w-2xl overflow-hidden hidden lg:flex items-center gap-6">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-100">
+          <Activity className="w-3.5 h-3.5 text-indigo-600" />
+          <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider leading-none">Live Updates</span>
         </div>
         
         <div className="flex-1 overflow-hidden relative h-6">
           <div 
-            className="flex flex-col transition-all duration-1000 ease-in-out absolute w-full"
+            className="flex flex-col transition-all duration-700 ease-in-out absolute w-full"
             style={{ transform: `translateY(-${tickerIndex * 24}px)` }}
           >
             {alertTicker.map((text, i) => (
               <div key={i} className="h-6 flex items-center">
-                <span className="text-[13px] font-medium text-text-muted/60 truncate font-mono tracking-tighter uppercase">{text}</span>
+                <span className="text-[13px] font-semibold text-slate-500 truncate">{text}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Right Matrix */}
-      <div className="flex items-center gap-10">
+      {/* Right Stats */}
+      <div className="flex items-center gap-8">
         {/* Network & Time */}
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-4 group cursor-help px-4 py-2 rounded-xl hover:bg-white/5 transition-all">
-            <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-safe shadow-[0_0_10px_#10b981] animate-pulse' : 'bg-critical'}`} />
-            <span className="text-[10px] font-black text-text-muted/60 uppercase tracking-[0.3em] hidden xl:inline">
-              {isOnline ? 'Uplink Stable' : 'Link Failure'}
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-default">
+            <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide hidden xl:inline">
+              {isOnline ? 'Network Active' : 'Offline'}
             </span>
           </div>
           
-          <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-            <Clock className="w-4 h-4 text-interactive opacity-60" />
-            <span className="text-[14px] font-bold text-white font-mono tracking-tighter">
+          <div className="flex items-center gap-2.5 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+            <Clock className="w-4 h-4 text-indigo-600 opacity-70" />
+            <span className="text-[14px] font-bold text-slate-700 tabular-nums">
               {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </span>
           </div>
         </div>
 
-        {/* Tactical Profile */}
-        <div className="flex items-center gap-5 pl-10 border-l border-white/5">
+        {/* User Profile */}
+        <div className="flex items-center gap-4 pl-8 border-l border-slate-200">
           <div className="hidden md:block text-right">
-            <p className="text-[14px] font-black text-white tracking-tight leading-none mb-1.5 uppercase">{user?.name || 'Operator Unknown'}</p>
-            <div className="flex items-center gap-2 justify-end">
-               <Cpu className="w-2.5 h-2.5 text-interactive" />
-               <p className="text-[9px] font-black text-interactive uppercase tracking-[0.25em] leading-none">{user?.role || 'VIEWER'}</p>
-            </div>
+            <p className="text-[14px] font-bold text-slate-900 leading-none mb-1">{user?.name || 'Administrator'}</p>
+            <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider leading-none">{user?.role || 'Guest'}</p>
           </div>
-          <div className="relative group overflow-hidden rounded-[18px]">
-             <div className="w-11 h-11 rounded-[18px] bg-white/5 flex items-center justify-center border border-white/10 group-active:scale-95 transition-all shadow-inner">
-                <span className="text-[15px] font-black text-white/40">{(user?.name || 'O')[0]}</span>
+          <div className="relative group cursor-pointer">
+             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200 group-hover:bg-slate-200 transition-all">
+                <span className="text-[15px] font-bold text-slate-500">{(user?.name || 'A')[0]}</span>
              </div>
-             <div className="absolute inset-0 bg-interactive/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-             <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-interactive rounded-full border-2 border-bg-panel shadow-[0_0_8px_#10b981]" />
+             <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
           </div>
         </div>
       </div>

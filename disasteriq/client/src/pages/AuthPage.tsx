@@ -12,15 +12,15 @@ import {
 } from 'lucide-react';
 
 const loginSchema = z.object({
-  email: z.string().email('Operational link (email) is invalid'),
-  password: z.string().min(6, 'Encryption key (password) must be at least 6 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Name required for node identification'),
-  email: z.string().email('Email required for grid uplink'),
-  password: z.string().min(6, 'Establish a strong encryption key'),
-  region: z.string().min(1, 'Sector assignment required'),
+  name: z.string().min(2, 'Name is required'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  region: z.string().min(1, 'Please select your region'),
   role: z.enum(['CITIZEN', 'VOLUNTEER', 'AUTHORITY', 'ADMIN']),
 });
 
@@ -28,10 +28,10 @@ type LoginData = z.infer<typeof loginSchema>;
 type RegisterData = z.infer<typeof registerSchema>;
 
 const intelFlow = [
-  "UPLINK: Direct satellite telemetry established for Northern Sector.",
-  "LOGISTICS: High-priority resource cloud synced with local depots.",
-  "PERSONNEL: 4,000+ verified responders active on the tactical grid.",
-  "GRID: All care pathways optimized. Predictive risk models online."
+  "Safe navigation routes have been updated for all sectors.",
+  "Community response network is now active and synchronized.",
+  "New emergency resource centers are opening in key regions.",
+  "Real-time monitoring system is providing accurate forecasts."
 ];
 
 export default function AuthPage() {
@@ -62,7 +62,7 @@ export default function AuthPage() {
       localStorage.setItem('disasteriq_token', res.data.token);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Authentication rejected. Verify operational credentials.');
+      setError(err.response?.data?.error || 'Unable to sign in. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -77,164 +77,154 @@ export default function AuthPage() {
       localStorage.setItem('disasteriq_token', res.data.token);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Grid registration failed. Network parameters mismatch.');
+      setError(err.response?.data?.error || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary relative flex items-center justify-center p-8 overflow-hidden font-sans">
-      {/* Tactical Background Layer */}
-      <div className="absolute inset-0 z-0">
-         <div className="absolute inset-0 bg-[#020617]" />
-         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-interactive/5 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2" />
-         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent-purple/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2" />
-         {/* Grid Pattern */}
-         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-      </div>
-
-      <div className="w-full max-w-[500px] z-10">
+    <div className="min-h-screen bg-bg-primary relative flex items-center justify-center p-8 overflow-hidden bg-mesh">
+      <div className="w-full max-w-[480px] z-10">
         {/* Branding Header */}
-        <div className="text-center mb-16 animate-fade-slide-up">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-[28px] bg-white/5 border border-white/10 shadow-3xl backdrop-blur-3xl mb-10 relative group">
-            <ShieldCheck className="w-10 h-10 text-interactive animate-pulse relative z-10" />
-            <div className="absolute inset-0 bg-interactive/10 blur-xl opacity-40 rounded-full" />
+        <div className="text-center mb-12 animate-fade-slide-up">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-xl mb-8 group overflow-hidden">
+            <Shield className="w-8 h-8 text-indigo-600 fill-indigo-600 transition-transform group-hover:scale-110" />
           </div>
-          <h1 className="text-5xl font-black tracking-tighter text-white mb-4 font-display uppercase">
-            Disaster<span className="text-interactive">IQ</span>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-2">
+            Disaster<span className="text-indigo-600">IQ</span>
           </h1>
-          <p className="text-[11px] text-text-muted/60 font-black uppercase tracking-[0.5em] mb-6">Tactical Response Framework</p>
+          <p className="text-sm text-slate-500 font-medium mb-8">Emergency Support & Coordination</p>
           
-          <div className="inline-flex items-center gap-4 px-6 py-2.5 rounded-full border border-white/5 bg-white/2 backdrop-blur-md">
-            <Radio className="w-3.5 h-3.5 text-interactive animate-pulse" />
-            <span className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-widest leading-none">{intelFlow[intelIndex]}</span>
+          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-slate-200 bg-white/50 backdrop-blur-sm">
+            <Activity className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="text-[11px] font-semibold text-slate-500">{intelFlow[intelIndex]}</span>
           </div>
         </div>
 
-        {/* Tactical Auth Module */}
-        <div className="glass-panel overflow-hidden border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] animate-fade-slide-up [animation-delay:150ms] rounded-[40px]">
-          <div className="p-12">
-            {/* Sector Selector Tabs */}
-            <div className="flex bg-white/2 rounded-2xl p-1.5 mb-10 border border-white/5 mx-auto max-w-[340px]">
+        {/* Auth Card */}
+        <div className="bg-white rounded-[32px] border border-slate-200 shadow-2xl shadow-slate-900/5 animate-fade-slide-up [animation-delay:150ms] overflow-hidden">
+          <div className="p-10">
+            {/* Tabs */}
+            <div className="flex bg-slate-50 rounded-xl p-1 mb-10 border border-slate-100">
               <button 
                 onClick={() => setIsLogin(true)}
-                className={`flex-1 py-3 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all duration-500 ${isLogin ? 'bg-interactive text-bg-primary shadow-xl shadow-interactive/20' : 'text-text-muted hover:text-white'}`}
+                className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all duration-300 ${isLogin ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
               >
-                Access
+                Sign In
               </button>
               <button 
                 onClick={() => setIsLogin(false)}
-                className={`flex-1 py-3 rounded-xl text-[12px] font-black uppercase tracking-widest transition-all duration-500 ${!isLogin ? 'bg-interactive text-bg-primary shadow-xl shadow-interactive/20' : 'text-text-muted hover:text-white'}`}
+                className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all duration-300 ${!isLogin ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
               >
-                Uplink
+                Create Account
               </button>
             </div>
 
             {error && (
-              <div className="mb-10 p-5 rounded-3xl bg-critical/5 border border-critical/10 flex items-center gap-5 animate-shake">
-                <AlertCircle className="w-5 h-5 text-critical shrink-0" />
-                <p className="text-[13px] font-bold text-critical/80 leading-tight uppercase tracking-tighter">{error}</p>
+              <div className="mb-8 p-4 rounded-xl bg-rose-50 border border-rose-100 flex items-center gap-3 animate-fade-in">
+                <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />
+                <p className="text-sm font-semibold text-rose-600 leading-tight">{error}</p>
               </div>
             )}
 
             {isLogin ? (
-              <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-8">
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2">Node Email</label>
+              <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
                   <div className="relative group">
-                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted/40 group-focus-within:text-interactive transition-colors" />
+                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                     <input 
                       {...loginForm.register('email')}
-                      className="w-full bg-white/2 border border-white/5 rounded-3xl pl-16 pr-6 py-5 text-[15px] text-white focus:outline-none focus:border-interactive transition-all font-medium placeholder:text-white/10"
-                      placeholder="operator@disasteriq.gov"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-14 pr-6 py-4 text-[15px] text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-300"
+                      placeholder="name@example.com"
                     />
                   </div>
-                  {loginForm.formState.errors.email && <p className="text-[10px] text-critical font-black uppercase tracking-widest ml-2">{loginForm.formState.errors.email.message}</p>}
+                  {loginForm.formState.errors.email && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider ml-1">{loginForm.formState.errors.email.message}</p>}
                 </div>
 
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2">RSA Encryption Key</label>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
                   <div className="relative group">
-                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted/40 group-focus-within:text-interactive transition-colors" />
+                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                     <input 
                       type="password"
                       {...loginForm.register('password')}
-                      className="w-full bg-white/2 border border-white/5 rounded-3xl pl-16 pr-6 py-5 text-[15px] text-white focus:outline-none focus:border-interactive transition-all font-medium placeholder:text-white/10"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-14 pr-6 py-4 text-[15px] text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-300"
                       placeholder="••••••••"
                     />
                   </div>
-                  {loginForm.formState.errors.password && <p className="text-[10px] text-critical font-black uppercase tracking-widest ml-2">{loginForm.formState.errors.password.message}</p>}
+                  {loginForm.formState.errors.password && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider ml-1">{loginForm.formState.errors.password.message}</p>}
                 </div>
 
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full py-6 rounded-[32px] bg-interactive text-bg-primary font-black text-[15px] uppercase tracking-[0.3em] shadow-3xl shadow-interactive/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 group"
+                  className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-[15px] shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-all disabled:opacity-50 group"
                 >
-                  {loading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : <div className="flex items-center justify-center gap-5">Initialize Protocol <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" /></div>}
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : <div className="flex items-center justify-center gap-3">Sign In <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></div>}
                 </button>
               </form>
             ) : (
-              <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-6">
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2">Full Identity</label>
+              <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Full Name</label>
                   <div className="relative group">
-                    <User className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted/40 group-focus-within:text-interactive transition-colors" />
+                    <User className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                     <input 
                       {...registerForm.register('name')}
-                      className="w-full bg-white/2 border border-white/5 rounded-3xl pl-16 pr-6 py-5 text-[15px] text-white focus:outline-none focus:border-interactive transition-all font-medium placeholder:text-white/10"
-                      placeholder="Operator Name"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-14 pr-6 py-4 text-[15px] text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-300"
+                      placeholder="Your Name"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2">Node Email</label>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
                   <div className="relative group">
-                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted/40 group-focus-within:text-interactive transition-colors" />
+                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                     <input 
                       {...registerForm.register('email')}
-                      className="w-full bg-white/2 border border-white/5 rounded-3xl pl-16 pr-6 py-5 text-[15px] text-white focus:outline-none focus:border-interactive transition-all font-medium placeholder:text-white/10"
-                      placeholder="operator@disasteriq.gov"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-14 pr-6 py-4 text-[15px] text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-300"
+                      placeholder="name@example.com"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-5">
-                   <div className="space-y-2.5">
-                     <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2">Sector</label>
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="space-y-2">
+                     <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Region</label>
                      <select 
                        {...registerForm.register('region')}
-                       className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-4 text-[13px] text-white font-bold tracking-tight outline-none focus:border-interactive appearance-none"
+                       className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 outline-none focus:border-indigo-500 transition-all appearance-none"
                      >
-                        <option value="metro">METRO SECTOR</option>
-                        <option value="north">NORTH SECTOR</option>
-                        <option value="south">SOUTH SECTOR</option>
-                        <option value="west">WEST SECTOR</option>
+                        <option value="metro">Metro</option>
+                        <option value="north">North</option>
+                        <option value="south">South</option>
+                        <option value="west">West</option>
                      </select>
                    </div>
-                   <div className="space-y-2.5">
-                     <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2">Designation</label>
+                   <div className="space-y-2">
+                     <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">I am a</label>
                      <select 
                        {...registerForm.register('role')}
-                       className="w-full bg-white/2 border border-white/5 rounded-2xl px-6 py-4 text-[13px] text-white font-bold tracking-tight outline-none focus:border-interactive appearance-none"
+                       className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 outline-none focus:border-indigo-500 transition-all appearance-none"
                      >
-                        <option value="CITIZEN">CITIZEN</option>
-                        <option value="VOLUNTEER">VOLUNTEER</option>
-                        <option value="AUTHORITY">AUTHORITY</option>
+                        <option value="CITIZEN">Citizen</option>
+                        <option value="VOLUNTEER">Volunteer</option>
+                        <option value="AUTHORITY">Authority</option>
                      </select>
                    </div>
                 </div>
 
-                <div className="space-y-2.5">
-                  <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-2">Encryption Key</label>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
                   <div className="relative group">
-                    <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted/40 group-focus-within:text-interactive transition-colors" />
+                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                     <input 
                       type="password"
                       {...registerForm.register('password')}
-                      className="w-full bg-white/2 border border-white/5 rounded-3xl pl-16 pr-6 py-5 text-[15px] text-white focus:outline-none focus:border-interactive transition-all font-medium placeholder:text-white/10"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-14 pr-6 py-4 text-[15px] text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium placeholder:text-slate-300"
                       placeholder="••••••••"
                     />
                   </div>
@@ -243,39 +233,30 @@ export default function AuthPage() {
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full py-6 rounded-[32px] bg-interactive text-bg-primary font-black text-[15px] uppercase tracking-[0.3em] shadow-3xl shadow-interactive/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                  className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-bold text-[15px] shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-all disabled:opacity-50"
                 >
-                  {loading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : 'Synchronize Node'}
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Create Account'}
                 </button>
               </form>
             )}
 
-            <div className="mt-12 pt-10 border-t border-white/5 flex flex-col items-center">
-               <div className="flex items-center gap-6 mb-8 w-full">
-                  <div className="h-px flex-1 bg-white/5" />
-                  <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em]">Operational Override</span>
-                  <div className="h-px flex-1 bg-white/5" />
-               </div>
-               <div className="flex gap-5 w-full">
+            <div className="mt-10 pt-8 border-t border-slate-50">
+               <div className="flex gap-4">
                   <button 
                     onClick={() => navigate('/emergency')}
-                    className="flex-1 py-4 rounded-2xl border border-critical/40 bg-critical/5 text-critical hover:bg-critical/10 text-[11px] font-black uppercase tracking-[0.2em] transition-all"
+                    className="flex-1 py-3 rounded-xl border border-rose-100 bg-rose-50 text-rose-600 hover:bg-rose-100 text-[11px] font-bold uppercase transition-all"
                   >
-                    SOS Access
+                    Quick SOS
                   </button>
                   <button 
                     onClick={() => navigate('/dashboard')}
-                    className="flex-1 py-4 rounded-2xl border border-white/5 bg-white/2 hover:bg-white/10 text-white/30 text-[10px] font-mono transition-all"
+                    className="flex-1 py-3 rounded-xl border border-slate-100 bg-white text-slate-400 hover:text-slate-600 text-[11px] font-bold uppercase transition-all"
                   >
-                    bypass_matrix
+                    Explore
                   </button>
                </div>
             </div>
           </div>
-        </div>
-        
-        <div className="mt-12 text-center text-[10px] text-text-muted/20 font-mono font-bold uppercase tracking-[0.4em] animate-fade-slide-up [animation-delay:400ms]">
-          Comms Protocol v4.4.2 // RSA // 4096-bit Secure Link
         </div>
       </div>
     </div>
