@@ -26,6 +26,9 @@ const meshRoutes = require('./routes/mesh');
 const { setupSockets } = require('./sockets');
 
 const prisma = new PrismaClient();
+if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
+  console.warn('⚠️ WARNING: DATABASE_URL is not set. Database operations will fail.');
+}
 const app = express();
 const server = http.createServer(app);
 

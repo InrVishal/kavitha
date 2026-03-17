@@ -4,10 +4,10 @@ import { useAuthStore } from '../store/authStore';
 import { useAnimatedCounter } from '../hooks/useUtils';
 import type { Volunteer } from '../types';
 import { 
-  Users, Search, UserPlus, MapPin, 
+  Users, Search, MapPin, 
   CheckCircle2, Clock, ShieldCheck, 
   Loader2, Globe, Heart, AlertCircle, X,
-  GraduationCap, Zap, Activity, Target, Cpu
+  Zap, Activity
 } from 'lucide-react';
 
 export default function VolunteersPage() {
@@ -155,7 +155,7 @@ export default function VolunteersPage() {
                       <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-none mb-1.5">{v.user?.name || 'Volunteer'}</h3>
                       <div className="flex items-center gap-2">
                         <MapPin className="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-400 transition-colors" />
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{v.user?.region || 'Metro Region'}</span>
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{v.user?.region ?? 'Metro Region'}</span>
                       </div>
                     </div>
                   </div>
