@@ -1,9 +1,17 @@
 {
-      "version": 2,
-      "rewrites": [
-              {
-                        "source": "/api/(.*)",
-                        "destination": "/server/src/index.js"
-              }
-      ]
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/socket.io/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/client/$1"
+    }
+  ]
 }
