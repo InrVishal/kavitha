@@ -77,8 +77,7 @@ apiRouter.use('/evacuation', evacuationRoutes);
 apiRouter.use('/scenarios', scenarioRoutes);
 apiRouter.use('/mesh', meshRoutes);
 
-// Health check
-app.get('/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
   res.json({ status: 'operational', timestamp: new Date().toISOString() });
 });
 
